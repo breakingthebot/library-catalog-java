@@ -9,6 +9,7 @@ package src.services;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -16,6 +17,7 @@ import java.util.logging.Logger;
 import src.models.Book;
 import src.models.LibraryCatalogState;
 import src.models.Member;
+import src.utils.TextSearchMatcher;
 
 /**
  * In-memory catalog service that enforces checkout rules.
@@ -137,6 +139,53 @@ public final class LibraryCatalogService {
     }
 
     /**
+     * Finds books whose id, title, or author contains the supplied query.
+     *
+     * @param query search query
+     * @return matching books in registration order
+     */
+    public List<Book> findBooks(String query) {
+        validateQuery(query);
+
+        List<Book> matches = new ArrayList<>();
+
+        for (Book book : booksById.values()) {
+            if (
+                TextSearchMatcher.containsIgnoreCase(book.getId(), query)
+                    || TextSearchMatcher.containsIgnoreCase(book.getTitle(), query)
+                    || TextSearchMatcher.containsIgnoreCase(book.getAuthor(), query)
+            ) {
+                matches.add(book);
+            }
+        }
+
+        return matches;
+    }
+
+    /**
+     * Finds members whose id or name contains the supplied query.
+     *
+     * @param query search query
+     * @return matching members in registration order
+     */
+    public List<Member> findMembers(String query) {
+        validateQuery(query);
+
+        List<Member> matches = new ArrayList<>();
+
+        for (Member member : membersById.values()) {
+            if (
+                TextSearchMatcher.containsIgnoreCase(member.getId(), query)
+                    || TextSearchMatcher.containsIgnoreCase(member.getName(), query)
+            ) {
+                matches.add(member);
+            }
+        }
+
+        return matches;
+    }
+
+    /**
      * Produces a persistence-safe snapshot of the current state.
      *
      * @return state snapshot
@@ -239,6 +288,17 @@ public final class LibraryCatalogService {
     private void validateState(LibraryCatalogState state) {
         if (state == null) {
             throw new IllegalArgumentException("Catalog state is required.");
+        }
+    }
+
+    /**
+     * Rejects blank search queries.
+     *
+     * @param query search query
+     */
+    private void validateQuery(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            throw new IllegalArgumentException("Search query is required.");
         }
     }
 }

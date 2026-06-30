@@ -36,6 +36,8 @@ public final class CatalogConsoleFormatter {
             "  return <book-id> <member-id>",
             "  list-books",
             "  list-members",
+            "  find-book <query>",
+            "  find-member <query>",
             "Optional flag:",
             "  --data <path>  Use a custom catalog file"
         );
@@ -83,5 +85,35 @@ public final class CatalogConsoleFormatter {
         }
 
         return joiner.toString();
+    }
+
+    /**
+     * Formats matched books for search output.
+     *
+     * @param books matching books
+     * @param query original search query
+     * @return formatted search result
+     */
+    public String formatBookSearchResults(Collection<Book> books, String query) {
+        if (books.isEmpty()) {
+            return "No books matched query: " + query;
+        }
+
+        return formatBooks(books);
+    }
+
+    /**
+     * Formats matched members for search output.
+     *
+     * @param members matching members
+     * @param query original search query
+     * @return formatted search result
+     */
+    public String formatMemberSearchResults(Collection<Member> members, String query) {
+        if (members.isEmpty()) {
+            return "No members matched query: " + query;
+        }
+
+        return formatMembers(members);
     }
 }

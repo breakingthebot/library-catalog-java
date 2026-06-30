@@ -75,6 +75,8 @@ public final class LibraryCatalogCliService {
             case RETURN -> executeReturn(catalogService, request);
             case LIST_BOOKS -> formatter.formatBooks(catalogService.getBooks());
             case LIST_MEMBERS -> formatter.formatMembers(catalogService.getMembers());
+            case FIND_BOOK -> executeFindBook(catalogService, request);
+            case FIND_MEMBER -> executeFindMember(catalogService, request);
         };
     }
 
@@ -170,6 +172,30 @@ public final class LibraryCatalogCliService {
      */
     private void persistState(LibraryCatalogService catalogService, CommandRequest request) throws IOException {
         persistenceService.save(catalogService.toState(), request.dataPath());
+    }
+
+    /**
+     * Searches books by id, title, or author.
+     *
+     * @param catalogService target catalog
+     * @param request parsed request
+     * @return formatted search results
+     */
+    private String executeFindBook(LibraryCatalogService catalogService, CommandRequest request) {
+        String query = request.arguments().getFirst();
+        return formatter.formatBookSearchResults(catalogService.findBooks(query), query);
+    }
+
+    /**
+     * Searches members by id or name.
+     *
+     * @param catalogService target catalog
+     * @param request parsed request
+     * @return formatted search results
+     */
+    private String executeFindMember(LibraryCatalogService catalogService, CommandRequest request) {
+        String query = request.arguments().getFirst();
+        return formatter.formatMemberSearchResults(catalogService.findMembers(query), query);
     }
 
     /**

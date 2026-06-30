@@ -48,6 +48,8 @@ Checkout and inspect the catalog:
 java -cp out src.LibraryCatalogApplication checkout book-010 member-010
 java -cp out src.LibraryCatalogApplication list-books
 java -cp out src.LibraryCatalogApplication list-members
+java -cp out src.LibraryCatalogApplication find-book "domain"
+java -cp out src.LibraryCatalogApplication find-member "jamie"
 ```
 
 Run the tests:
@@ -63,11 +65,11 @@ GitHub Actions runs the same compile and test commands on every push to `main` a
 Not deployed. This is a local Java command-line project.
 
 ## Architecture Notes
-This build turns the library system into an actual command-line tool instead of a fixed demo. The domain and persistence layers from the first iteration stay intact, and a dedicated CLI parser plus an application service now load the saved catalog, run one command, and persist changes back to disk. That structure keeps command handling separate from business rules, so future work like search, reporting, or a different UI can reuse the same catalog core.
+This build turns the library system into an actual command-line tool instead of a fixed demo. The domain and persistence layers from the first iteration stay intact, and a dedicated CLI parser plus an application service now load the saved catalog, run one command, and persist changes back to disk. Search commands now sit on top of the same core service, which means lookup features reuse the same in-memory model instead of creating a separate reporting path.
 
 ## Notes
 - Iteration 1 uses a custom lightweight test runner because Maven is not installed locally.
 - The default catalog file is `data/library-catalog.txt`.
 - Any command can target a different file with `--data <path>`.
-- Commands currently supported: `help`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, and `list-members`.
+- Commands currently supported: `help`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, `list-members`, `find-book`, and `find-member`.
 - Continuous integration lives in `.github/workflows/java-ci.yml` and uses JDK 24.

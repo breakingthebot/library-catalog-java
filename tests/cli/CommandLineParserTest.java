@@ -25,6 +25,7 @@ public final class CommandLineParserTest {
     public static void runAll() {
         defaultsToHelpWithDefaultPath();
         parsesCustomDataPath();
+        parsesSearchCommand();
         rejectsMissingArguments();
     }
 
@@ -49,6 +50,17 @@ public final class CommandLineParserTest {
         TestAssertions.assertEquals(CommandName.ADD_BOOK, request.commandName(), "Command should parse correctly.");
         TestAssertions.assertEquals(Path.of("tmp/catalog.txt"), request.dataPath(), "Data flag should override the path.");
         TestAssertions.assertEquals(3, request.arguments().size(), "Book command should keep its three arguments.");
+    }
+
+    /**
+     * Verifies search command parsing.
+     */
+    private static void parsesSearchCommand() {
+        CommandLineParser parser = new CommandLineParser();
+        CommandRequest request = parser.parse(new String[] {"find-book", "pragmatic"});
+
+        TestAssertions.assertEquals(CommandName.FIND_BOOK, request.commandName(), "Search command should parse correctly.");
+        TestAssertions.assertEquals(1, request.arguments().size(), "Search command should keep a single query argument.");
     }
 
     /**

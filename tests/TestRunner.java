@@ -14,6 +14,7 @@ import tests.services.CatalogPersistenceServiceTest;
 import tests.services.LibraryCatalogCliServiceTest;
 import tests.services.LibraryCatalogServiceTest;
 import tests.utils.FieldCodecTest;
+import tests.utils.TextSearchMatcherTest;
 
 /**
  * Main entry point for the custom test suite.
@@ -34,6 +35,7 @@ public final class TestRunner {
         BookTest.runAll();
         MemberTest.runAll();
         FieldCodecTest.runAll();
+        TextSearchMatcherTest.runAll();
         LibraryCatalogServiceTest.runAll();
         CatalogPersistenceServiceTest.runAll();
         LibraryCatalogCliServiceTest.runAll();

@@ -17,5 +17,7 @@ public enum CommandName {
     CHECKOUT,
     RETURN,
     LIST_BOOKS,
-    LIST_MEMBERS
+    LIST_MEMBERS,
+    FIND_BOOK,
+    FIND_MEMBER
 }

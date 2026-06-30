@@ -28,6 +28,7 @@ public final class CatalogConsoleFormatterTest {
         rendersHelpText();
         rendersBookListings();
         rendersMemberListings();
+        rendersEmptySearchResults();
     }
 
     /**
@@ -59,5 +60,18 @@ public final class CatalogConsoleFormatterTest {
         String output = formatter.formatMembers(List.of(new Member("member-600", "Alex Kim", Set.of("book-600"))));
 
         TestAssertions.assertTrue(output.contains("member-600 | Alex Kim | book-600"), "Members should include borrowed book ids.");
+    }
+
+    /**
+     * Verifies search no-match output.
+     */
+    private static void rendersEmptySearchResults() {
+        CatalogConsoleFormatter formatter = new CatalogConsoleFormatter();
+
+        TestAssertions.assertEquals(
+            "No books matched query: missing",
+            formatter.formatBookSearchResults(List.of(), "missing"),
+            "Book searches should explain when nothing matches."
+        );
     }
 }

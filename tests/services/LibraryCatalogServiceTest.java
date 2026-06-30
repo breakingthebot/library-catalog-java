@@ -25,6 +25,7 @@ public final class LibraryCatalogServiceTest {
         checksOutAndReturnsBooks();
         rejectsDuplicateBookIds();
         rejectsCheckoutOfUnavailableBook();
+        findsBooksAndMembersByPartialMatch();
     }
 
     /**
@@ -81,5 +82,19 @@ public final class LibraryCatalogServiceTest {
             IllegalStateException.class,
             "Already checked out books should not be loaned twice."
         );
+    }
+
+    /**
+     * Verifies partial and case-insensitive search behavior.
+     */
+    private static void findsBooksAndMembersByPartialMatch() {
+        LibraryCatalogService service = new LibraryCatalogService();
+        service.addBook(new Book("book-304", "Domain-Driven Design", "Eric Evans"));
+        service.addBook(new Book("book-305", "Refactoring", "Martin Fowler"));
+        service.addMember(new Member("member-305", "Jamie Cross"));
+
+        TestAssertions.assertEquals(1, service.findBooks("eric").size(), "Author search should find matching books.");
+        TestAssertions.assertEquals(1, service.findBooks("domain").size(), "Title search should find matching books.");
+        TestAssertions.assertEquals(1, service.findMembers("jamie").size(), "Name search should find matching members.");
     }
 }

@@ -11,3 +11,5 @@
 - Added `help`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, and `list-members` commands.
 - Added tests for CLI parsing, console formatting, and persisted command workflows.
 - Added a GitHub Actions workflow that compiles the project and runs `tests.TestRunner` on pushes and pull requests.
+- Added `find-book` and `find-member` commands for case-insensitive catalog search across persisted data.
+- Added search-specific utility and tests for parser, formatter, service, and CLI search behavior.

@@ -31,6 +31,7 @@ public final class LibraryCatalogCliServiceTest {
     public static void runAll() throws IOException {
         seedsEmptyCatalog();
         mutatesAndListsCatalog();
+        searchesPersistedCatalog();
     }
 
     /**
@@ -68,5 +69,27 @@ public final class LibraryCatalogCliServiceTest {
 
         TestAssertions.assertTrue(bookListing.contains("book-700 | Release It! | Michael Nygard | checked out"), "Book listing should reflect checkout state.");
         TestAssertions.assertTrue(memberListing.contains("member-700 | Drew Cole | book-700"), "Member listing should reflect borrowed books.");
+    }
+
+    /**
+     * Verifies search commands use persisted catalog state.
+     *
+     * @throws IOException when file IO fails
+     */
+    private static void searchesPersistedCatalog() throws IOException {
+        Path tempFile = Files.createTempFile("library-cli-search-", ".txt");
+        Files.deleteIfExists(tempFile);
+        LibraryCatalogCliService service = new LibraryCatalogCliService(new CatalogPersistenceService(), new CatalogConsoleFormatter());
+
+        service.execute(new CommandRequest(CommandName.ADD_BOOK, java.util.List.of("book-710", "Clean Architecture", "Robert C. Martin"), tempFile));
+        service.execute(new CommandRequest(CommandName.ADD_MEMBER, java.util.List.of("member-710", "Casey Nguyen"), tempFile));
+
+        String bookResult = service.execute(new CommandRequest(CommandName.FIND_BOOK, java.util.List.of("architecture"), tempFile));
+        String memberResult = service.execute(new CommandRequest(CommandName.FIND_MEMBER, java.util.List.of("casey"), tempFile));
+        String emptyResult = service.execute(new CommandRequest(CommandName.FIND_BOOK, java.util.List.of("missing"), tempFile));
+
+        TestAssertions.assertTrue(bookResult.contains("book-710 | Clean Architecture | Robert C. Martin | available"), "Book search should return matching books.");
+        TestAssertions.assertTrue(memberResult.contains("member-710 | Casey Nguyen | no borrowed books"), "Member search should return matching members.");
+        TestAssertions.assertEquals("No books matched query: missing", emptyResult, "No-match search should explain the result.");
     }
 }

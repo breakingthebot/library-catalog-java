@@ -74,6 +74,8 @@ public final class CommandLineParser {
             case "return" -> CommandName.RETURN;
             case "list-books" -> CommandName.LIST_BOOKS;
             case "list-members" -> CommandName.LIST_MEMBERS;
+            case "find-book" -> CommandName.FIND_BOOK;
+            case "find-member" -> CommandName.FIND_MEMBER;
             default -> throw new IllegalArgumentException("Unknown command: " + token);
         };
     }
@@ -89,6 +91,7 @@ public final class CommandLineParser {
             case HELP, SEED, LIST_BOOKS, LIST_MEMBERS -> 0;
             case ADD_MEMBER, CHECKOUT, RETURN -> 2;
             case ADD_BOOK -> 3;
+            case FIND_BOOK, FIND_MEMBER -> 1;
         };
 
         if (argumentCount != expectedCount) {
