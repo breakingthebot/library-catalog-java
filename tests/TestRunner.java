@@ -6,9 +6,12 @@
  */
 package tests;
 
+import tests.cli.CatalogConsoleFormatterTest;
+import tests.cli.CommandLineParserTest;
 import tests.models.BookTest;
 import tests.models.MemberTest;
 import tests.services.CatalogPersistenceServiceTest;
+import tests.services.LibraryCatalogCliServiceTest;
 import tests.services.LibraryCatalogServiceTest;
 import tests.utils.FieldCodecTest;
 
@@ -26,11 +29,14 @@ public final class TestRunner {
      * @throws Exception when a test fails
      */
     public static void main(String[] args) throws Exception {
+        CommandLineParserTest.runAll();
+        CatalogConsoleFormatterTest.runAll();
         BookTest.runAll();
         MemberTest.runAll();
         FieldCodecTest.runAll();
         LibraryCatalogServiceTest.runAll();
         CatalogPersistenceServiceTest.runAll();
+        LibraryCatalogCliServiceTest.runAll();
         System.out.println("All tests passed.");
     }
 }

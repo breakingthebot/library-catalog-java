@@ -7,3 +7,6 @@
 - Added a flat-file persistence service for saving and loading catalog state.
 - Added a CLI entry point that demonstrates registration, checkout, save, and reload.
 - Added a lightweight custom Java test runner with coverage for models, services, and utility encoding logic.
+- Replaced the demo-only entry point with an interactive CLI parser and command execution layer.
+- Added `help`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, and `list-members` commands.
+- Added tests for CLI parsing, console formatting, and persisted command workflows.
