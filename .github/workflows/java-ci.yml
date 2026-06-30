@@ -1,0 +1,35 @@
+# .github/workflows/java-ci.yml
+# Runs compile and test checks for the Java library catalog on GitHub Actions.
+# Connects to: src/**/*.java, tests/**/*.java
+# Created: 2026-06-30
+name: Java CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "24"
+
+      - name: Compile project
+        run: |
+          mkdir -p out
+          javac -d out $(find src tests -name "*.java")
+
+      - name: Run test suite
+        run: java -cp out tests.TestRunner

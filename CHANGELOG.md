@@ -10,3 +10,4 @@
 - Replaced the demo-only entry point with an interactive CLI parser and command execution layer.
 - Added `help`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, and `list-members` commands.
 - Added tests for CLI parsing, console formatting, and persisted command workflows.
+- Added a GitHub Actions workflow that compiles the project and runs `tests.TestRunner` on pushes and pull requests.

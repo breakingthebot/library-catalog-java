@@ -56,6 +56,9 @@ Run the tests:
 java -cp out tests.TestRunner
 ```
 
+## CI
+GitHub Actions runs the same compile and test commands on every push to `main` and every pull request targeting `main`.
+
 ## Deployed
 Not deployed. This is a local Java command-line project.
 
@@ -67,3 +70,4 @@ This build turns the library system into an actual command-line tool instead of 
 - The default catalog file is `data/library-catalog.txt`.
 - Any command can target a different file with `--data <path>`.
 - Commands currently supported: `help`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, and `list-members`.
+- Continuous integration lives in `.github/workflows/java-ci.yml` and uses JDK 24.
