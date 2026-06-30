@@ -1,6 +1,6 @@
 # .github/workflows/java-ci.yml
-# Runs Maven-based compile and test checks for the Java library catalog on GitHub Actions.
-# Connects to: pom.xml, src/main/java/**, src/test/java/**
+# Runs Maven-based compile, test, and executable-jar checks for the Java library catalog on GitHub Actions.
+# Connects to: pom.xml, src/main/java/**, src/test/java/**, target/library-catalog.jar
 # Created: 2026-06-30
 name: Java CI
 
@@ -27,5 +27,5 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Run Maven test suite
-        run: ./mvnw -q test
+      - name: Build executable jar
+        run: ./mvnw -q package

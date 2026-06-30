@@ -22,3 +22,5 @@
 - Added tests for successful execution, unknown commands, and business-rule failures at the application boundary.
 - Added a `bootstrap` command that seeds sample data only when the target catalog file is missing.
 - Added tests for bootstrap parsing, first-run initialization, and idempotent skip behavior for existing files.
+- Added Maven JAR plugin configuration so packaging produces a runnable `target/library-catalog.jar`.
+- Updated CI and local docs to validate and launch the executable jar with `java -jar`.
