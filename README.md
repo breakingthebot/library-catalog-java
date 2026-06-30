@@ -63,6 +63,13 @@ java -jar target/library-catalog.jar add-book book-010 "Domain-Driven Design" "E
 java -jar target/library-catalog.jar add-member member-010 "Jamie Cross"
 ```
 
+Remove an available book or an idle member:
+
+```powershell
+java -jar target/library-catalog.jar remove-book book-010
+java -jar target/library-catalog.jar remove-member member-010
+```
+
 Checkout and inspect the catalog:
 
 ```powershell
@@ -81,16 +88,17 @@ GitHub Actions runs `./mvnw -q package` on every push to `main` and every pull r
 Not deployed. This is a local Java command-line project.
 
 ## Architecture Notes
-This build now uses a conventional Maven project layout instead of an ad hoc compile script and custom test runner. The application code lives under `src/main/java`, the tests live under `src/test/java`, and JUnit 5 now drives the test suite. On top of that, the Maven build now produces a runnable jar, so the project is no longer just source you can build; it is a CLI artifact you can package and launch directly with `java -jar`. The internal Java packages now use a real namespace, `com.breakingthebot.librarycatalog`, which makes the codebase look and behave like a conventional Java project instead of a temporary scaffold.
+This build now uses a conventional Maven project layout instead of an ad hoc compile script and custom test runner. The application code lives under `src/main/java`, the tests live under `src/test/java`, and JUnit 5 now drives the test suite. On top of that, the Maven build now produces a runnable jar, so the project is no longer just source you can build; it is a CLI artifact you can package and launch directly with `java -jar`. The internal Java packages now use a real namespace, `com.breakingthebot.librarycatalog`, which makes the codebase look and behave like a conventional Java project instead of a temporary scaffold. This iteration also rounds out the catalog lifecycle by letting you remove books and members safely, with explicit guards that block deleting checked-out books or members who still hold loans.
 
 ## Notes
 - The project now uses Maven with JUnit 5 instead of the earlier custom test harness.
 - The default catalog file is `data/library-catalog.txt`.
 - Any command can target a different file with `--data <path>`.
-- Commands currently supported: `help`, `version`, `--version`, `bootstrap`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, `list-members`, `find-book`, `find-member`, and `loan-report`.
+- Commands currently supported: `help`, `version`, `--version`, `bootstrap`, `seed`, `add-book`, `add-member`, `remove-book`, `remove-member`, `checkout`, `return`, `list-books`, `list-members`, `find-book`, `find-member`, and `loan-report`.
 - Continuous integration lives in `.github/workflows/java-ci.yml` and runs `./mvnw -q package` on JDK 21.
 - CLI boundary errors now return stable exit codes and clear messages with a `help` hint.
 - `bootstrap` seeds sample data only when the target catalog file does not already exist; it never overwrites an existing file.
+- `remove-book` only works for available books, and `remove-member` only works for members with no active loans.
 - The primary distributable artifact is `target/library-catalog.jar`.
 - The code now uses the `com.breakingthebot.librarycatalog` package namespace across production and test code.
 - `--version` reads Maven metadata from the packaged artifact and prints the current application version.

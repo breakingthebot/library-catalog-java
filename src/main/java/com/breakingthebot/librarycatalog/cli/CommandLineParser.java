@@ -72,6 +72,8 @@ public final class CommandLineParser {
             case "seed" -> CommandName.SEED;
             case "add-book" -> CommandName.ADD_BOOK;
             case "add-member" -> CommandName.ADD_MEMBER;
+            case "remove-book" -> CommandName.REMOVE_BOOK;
+            case "remove-member" -> CommandName.REMOVE_MEMBER;
             case "checkout" -> CommandName.CHECKOUT;
             case "return" -> CommandName.RETURN;
             case "list-books" -> CommandName.LIST_BOOKS;
@@ -92,9 +94,9 @@ public final class CommandLineParser {
     private void validateArgumentCount(CommandName commandName, int argumentCount) {
         int expectedCount = switch (commandName) {
             case HELP, VERSION, BOOTSTRAP, SEED, LIST_BOOKS, LIST_MEMBERS, LOAN_REPORT -> 0;
+            case REMOVE_BOOK, REMOVE_MEMBER, FIND_BOOK, FIND_MEMBER -> 1;
             case ADD_MEMBER, CHECKOUT, RETURN -> 2;
             case ADD_BOOK -> 3;
-            case FIND_BOOK, FIND_MEMBER -> 1;
         };
 
         if (argumentCount != expectedCount) {

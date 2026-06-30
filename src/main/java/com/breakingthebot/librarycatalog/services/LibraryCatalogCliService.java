@@ -77,6 +77,8 @@ public final class LibraryCatalogCliService {
             case SEED -> executeSeed(catalogService, request);
             case ADD_BOOK -> executeAddBook(catalogService, request);
             case ADD_MEMBER -> executeAddMember(catalogService, request);
+            case REMOVE_BOOK -> executeRemoveBook(catalogService, request);
+            case REMOVE_MEMBER -> executeRemoveMember(catalogService, request);
             case CHECKOUT -> executeCheckout(catalogService, request);
             case RETURN -> executeReturn(catalogService, request);
             case LIST_BOOKS -> formatter.formatBooks(catalogService.getBooks());
@@ -153,6 +155,36 @@ public final class LibraryCatalogCliService {
         catalogService.addMember(member);
         persistState(catalogService, request);
         return "Added member " + member.getId() + ".";
+    }
+
+    /**
+     * Removes a book and persists the catalog.
+     *
+     * @param catalogService target catalog
+     * @param request parsed request
+     * @return success message
+     * @throws IOException when persistence fails
+     */
+    private String executeRemoveBook(LibraryCatalogService catalogService, CommandRequest request) throws IOException {
+        String bookId = request.arguments().getFirst();
+        catalogService.removeBook(bookId);
+        persistState(catalogService, request);
+        return "Removed book " + bookId + ".";
+    }
+
+    /**
+     * Removes a member and persists the catalog.
+     *
+     * @param catalogService target catalog
+     * @param request parsed request
+     * @return success message
+     * @throws IOException when persistence fails
+     */
+    private String executeRemoveMember(LibraryCatalogService catalogService, CommandRequest request) throws IOException {
+        String memberId = request.arguments().getFirst();
+        catalogService.removeMember(memberId);
+        persistState(catalogService, request);
+        return "Removed member " + memberId + ".";
     }
 
     /**

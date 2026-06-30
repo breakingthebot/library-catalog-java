@@ -16,6 +16,8 @@ public enum CommandName {
     SEED,
     ADD_BOOK,
     ADD_MEMBER,
+    REMOVE_BOOK,
+    REMOVE_MEMBER,
     CHECKOUT,
     RETURN,
     LIST_BOOKS,

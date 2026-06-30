@@ -62,6 +62,38 @@ public final class LibraryCatalogService {
     }
 
     /**
+     * Removes a book when it exists and is not checked out.
+     *
+     * @param bookId book identifier
+     */
+    public void removeBook(String bookId) {
+        Book book = requireBook(bookId);
+
+        if (book.isCheckedOut()) {
+            throw new IllegalStateException("Cannot remove book " + bookId + ": book is currently checked out.");
+        }
+
+        booksById.remove(bookId);
+        LOGGER.log(Level.INFO, "Removed book {0}", bookId);
+    }
+
+    /**
+     * Removes a member when they exist and hold no active loans.
+     *
+     * @param memberId member identifier
+     */
+    public void removeMember(String memberId) {
+        Member member = requireMember(memberId);
+
+        if (!member.getBorrowedBookIds().isEmpty()) {
+            throw new IllegalStateException("Cannot remove member " + memberId + ": member still has borrowed books.");
+        }
+
+        membersById.remove(memberId);
+        LOGGER.log(Level.INFO, "Removed member {0}", memberId);
+    }
+
+    /**
      * Checks a book out to a member when both exist and the book is available.
      *
      * @param bookId book identifier

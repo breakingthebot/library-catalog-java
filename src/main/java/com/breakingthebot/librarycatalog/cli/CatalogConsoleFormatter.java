@@ -35,6 +35,8 @@ public final class CatalogConsoleFormatter {
             "  seed",
             "  add-book <book-id> <title> <author>",
             "  add-member <member-id> <name>",
+            "  remove-book <book-id>",
+            "  remove-member <member-id>",
             "  checkout <book-id> <member-id>",
             "  return <book-id> <member-id>",
             "  list-books",

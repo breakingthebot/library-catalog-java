@@ -82,6 +82,61 @@ public final class LibraryCatalogCliServiceTest {
     }
 
     /**
+     * Verifies remove commands persist deletions for available books and idle members.
+     *
+     * @throws IOException when file IO fails
+     */
+    @Test
+    void removesPersistedBookAndMember() throws IOException {
+        Path tempFile = Files.createTempFile("library-cli-remove-", ".txt");
+        Files.deleteIfExists(tempFile);
+        LibraryCatalogCliService service = new LibraryCatalogCliService(new CatalogPersistenceService(), new CatalogConsoleFormatter());
+
+        service.execute(new CommandRequest(CommandName.ADD_BOOK, java.util.List.of("book-705", "DDD Distilled", "Vaughn Vernon"), tempFile));
+        service.execute(new CommandRequest(CommandName.ADD_MEMBER, java.util.List.of("member-705", "Morgan Ellis"), tempFile));
+
+        String removedBook = service.execute(new CommandRequest(CommandName.REMOVE_BOOK, java.util.List.of("book-705"), tempFile));
+        String removedMember = service.execute(new CommandRequest(CommandName.REMOVE_MEMBER, java.util.List.of("member-705"), tempFile));
+        String bookListing = service.execute(new CommandRequest(CommandName.LIST_BOOKS, java.util.List.of(), tempFile));
+        String memberListing = service.execute(new CommandRequest(CommandName.LIST_MEMBERS, java.util.List.of(), tempFile));
+
+        assertEquals("Removed book book-705.", removedBook, "Remove book should report the removed id.");
+        assertEquals("Removed member member-705.", removedMember, "Remove member should report the removed id.");
+        assertEquals("No books found.", bookListing, "Removed books should not appear in persisted listings.");
+        assertEquals("No members found.", memberListing, "Removed members should not appear in persisted listings.");
+    }
+
+    /**
+     * Verifies remove commands preserve loan integrity rules.
+     *
+     * @throws IOException when file IO fails
+     */
+    @Test
+    void rejectsUnsafePersistedRemovals() throws IOException {
+        Path tempFile = Files.createTempFile("library-cli-remove-rules-", ".txt");
+        Files.deleteIfExists(tempFile);
+        LibraryCatalogCliService service = new LibraryCatalogCliService(new CatalogPersistenceService(), new CatalogConsoleFormatter());
+
+        service.execute(new CommandRequest(CommandName.ADD_BOOK, java.util.List.of("book-706", "Clean Code", "Robert C. Martin"), tempFile));
+        service.execute(new CommandRequest(CommandName.ADD_MEMBER, java.util.List.of("member-706", "Skyler Reed"), tempFile));
+        service.execute(new CommandRequest(CommandName.CHECKOUT, java.util.List.of("book-706", "member-706"), tempFile));
+
+        IllegalStateException bookError = org.junit.jupiter.api.Assertions.assertThrows(
+            IllegalStateException.class,
+            () -> service.execute(new CommandRequest(CommandName.REMOVE_BOOK, java.util.List.of("book-706"), tempFile)),
+            "Checked-out books should not be removable through the CLI."
+        );
+        IllegalStateException memberError = org.junit.jupiter.api.Assertions.assertThrows(
+            IllegalStateException.class,
+            () -> service.execute(new CommandRequest(CommandName.REMOVE_MEMBER, java.util.List.of("member-706"), tempFile)),
+            "Members with active loans should not be removable through the CLI."
+        );
+
+        assertTrue(bookError.getMessage().contains("currently checked out"), "Book removal should explain the blocking loan.");
+        assertTrue(memberError.getMessage().contains("still has borrowed books"), "Member removal should explain the blocking loan.");
+    }
+
+    /**
      * Verifies search commands use persisted catalog state.
      *
      * @throws IOException when file IO fails

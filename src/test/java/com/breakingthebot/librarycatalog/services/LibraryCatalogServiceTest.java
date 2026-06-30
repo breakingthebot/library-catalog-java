@@ -79,6 +79,66 @@ public final class LibraryCatalogServiceTest {
     }
 
     /**
+     * Verifies available books can be removed cleanly.
+     */
+    @Test
+    void removesAvailableBook() {
+        LibraryCatalogService service = new LibraryCatalogService();
+        service.addBook(new Book("book-303a", "Refactoring UI", "Adam Wathan and Steve Schoger"));
+
+        service.removeBook("book-303a");
+
+        assertTrue(service.findBook("book-303a").isEmpty(), "Removed books should no longer exist.");
+    }
+
+    /**
+     * Verifies checked-out books cannot be removed.
+     */
+    @Test
+    void rejectsRemovingCheckedOutBook() {
+        LibraryCatalogService service = new LibraryCatalogService();
+        service.addBook(new Book("book-303b", "Release It!", "Michael Nygard"));
+        service.addMember(new Member("member-303b", "Jordan Lee"));
+        service.checkoutBook("book-303b", "member-303b");
+
+        assertThrows(
+            IllegalStateException.class,
+            () -> service.removeBook("book-303b"),
+            "Checked-out books should not be removable."
+        );
+    }
+
+    /**
+     * Verifies members without active loans can be removed.
+     */
+    @Test
+    void removesMemberWithoutLoans() {
+        LibraryCatalogService service = new LibraryCatalogService();
+        service.addMember(new Member("member-304a", "Quinn Parker"));
+
+        service.removeMember("member-304a");
+
+        assertTrue(service.findMember("member-304a").isEmpty(), "Removed members should no longer exist.");
+    }
+
+    /**
+     * Verifies members with active loans cannot be removed.
+     */
+    @Test
+    void rejectsRemovingMemberWithLoans() {
+        LibraryCatalogService service = new LibraryCatalogService();
+        service.addBook(new Book("book-304b", "Test Driven Development", "Kent Beck"));
+        service.addMember(new Member("member-304b", "Avery Kim"));
+        service.checkoutBook("book-304b", "member-304b");
+
+        assertThrows(
+            IllegalStateException.class,
+            () -> service.removeMember("member-304b"),
+            "Members with borrowed books should not be removable."
+        );
+    }
+
+    /**
      * Verifies partial and case-insensitive search behavior.
      */
     @Test

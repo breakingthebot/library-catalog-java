@@ -28,3 +28,6 @@
 - Updated the runnable jar manifest to use the renamed main application class.
 - Added `version` / `--version` support backed by Maven-generated package metadata.
 - Added tests for version parsing, application-level version output, and metadata fallback behavior during test runs.
+- Added `remove-book` and `remove-member` commands for safe catalog cleanup.
+- Added guardrails that block deleting checked-out books and members who still hold borrowed books.
+- Added parser, service, and persisted CLI tests for the new removal workflows.

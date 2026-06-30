@@ -81,6 +81,18 @@ public final class CommandLineParserTest {
     }
 
     /**
+     * Verifies remove command parsing.
+     */
+    @Test
+    void parsesRemoveBookCommand() {
+        CommandLineParser parser = new CommandLineParser();
+        CommandRequest request = parser.parse(new String[] {"remove-book", "book-501"});
+
+        assertEquals(CommandName.REMOVE_BOOK, request.commandName(), "Remove book should parse correctly.");
+        assertEquals(1, request.arguments().size(), "Remove book should keep a single identifier argument.");
+    }
+
+    /**
      * Verifies version parsing.
      */
     @Test
