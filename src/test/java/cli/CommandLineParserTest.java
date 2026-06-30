@@ -69,6 +69,18 @@ public final class CommandLineParserTest {
     }
 
     /**
+     * Verifies bootstrap parsing.
+     */
+    @Test
+    void parsesBootstrapCommand() {
+        CommandLineParser parser = new CommandLineParser();
+        CommandRequest request = parser.parse(new String[] {"bootstrap"});
+
+        assertEquals(CommandName.BOOTSTRAP, request.commandName(), "Bootstrap command should parse correctly.");
+        assertEquals(0, request.arguments().size(), "Bootstrap should not require arguments.");
+    }
+
+    /**
      * Verifies incorrect argument counts are rejected.
      */
     @Test

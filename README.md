@@ -37,6 +37,12 @@ java -cp target/classes src.LibraryCatalogApplication help
 
 Invalid commands now return a stable non-zero exit code with a user-facing error message instead of a raw stack trace.
 
+Bootstrap a missing catalog with sample data only on first run:
+
+```powershell
+java -cp target/classes src.LibraryCatalogApplication bootstrap --data temp-catalog.txt
+```
+
 Seed a new catalog:
 
 ```powershell
@@ -74,6 +80,7 @@ This build now uses a conventional Maven project layout instead of an ad hoc com
 - The project now uses Maven with JUnit 5 instead of the earlier custom test harness.
 - The default catalog file is `data/library-catalog.txt`.
 - Any command can target a different file with `--data <path>`.
-- Commands currently supported: `help`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, `list-members`, `find-book`, `find-member`, and `loan-report`.
+- Commands currently supported: `help`, `bootstrap`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, `list-members`, `find-book`, `find-member`, and `loan-report`.
 - Continuous integration lives in `.github/workflows/java-ci.yml` and runs `./mvnw -q test` on JDK 21.
 - CLI boundary errors now return stable exit codes and clear messages with a `help` hint.
+- `bootstrap` seeds sample data only when the target catalog file does not already exist; it never overwrites an existing file.

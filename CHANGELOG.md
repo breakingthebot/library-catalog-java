@@ -20,3 +20,5 @@
 - Updated GitHub Actions to run the Maven test suite on JDK 21.
 - Added a top-level application runner that translates parse, validation, and IO failures into stable user-facing CLI errors.
 - Added tests for successful execution, unknown commands, and business-rule failures at the application boundary.
+- Added a `bootstrap` command that seeds sample data only when the target catalog file is missing.
+- Added tests for bootstrap parsing, first-run initialization, and idempotent skip behavior for existing files.

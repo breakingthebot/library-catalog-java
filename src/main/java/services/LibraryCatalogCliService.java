@@ -68,6 +68,7 @@ public final class LibraryCatalogCliService {
 
         return switch (request.commandName()) {
             case HELP -> formatter.formatHelp(request.dataPath());
+            case BOOTSTRAP -> executeBootstrap(request);
             case SEED -> executeSeed(catalogService, request);
             case ADD_BOOK -> executeAddBook(catalogService, request);
             case ADD_MEMBER -> executeAddMember(catalogService, request);
@@ -79,6 +80,24 @@ public final class LibraryCatalogCliService {
             case FIND_MEMBER -> executeFindMember(catalogService, request);
             case LOAN_REPORT -> formatter.formatLoanReport(catalogService.getActiveLoans());
         };
+    }
+
+    /**
+     * Seeds sample data only when the target catalog file does not already exist.
+     *
+     * @param request parsed request
+     * @return bootstrap result message
+     * @throws IOException when persistence fails
+     */
+    private String executeBootstrap(CommandRequest request) throws IOException {
+        if (persistenceService.exists(request.dataPath())) {
+            return "Bootstrap skipped: catalog file already exists at " + request.dataPath().toAbsolutePath() + ".";
+        }
+
+        LibraryCatalogService catalogService = new LibraryCatalogService();
+        seedCatalog(catalogService);
+        persistState(catalogService, request);
+        return "Bootstrapped catalog with 2 books and 1 member.";
     }
 
     /**
@@ -94,10 +113,7 @@ public final class LibraryCatalogCliService {
             throw new IllegalStateException("Seed command requires an empty catalog file.");
         }
 
-        catalogService.addBook(new Book("book-001", "The Pragmatic Programmer", "Andrew Hunt and David Thomas"));
-        catalogService.addBook(new Book("book-002", "Clean Code", "Robert C. Martin"));
-        catalogService.addMember(new Member("member-001", "Avery Stone"));
-
+        seedCatalog(catalogService);
         persistState(catalogService, request);
         return "Seeded catalog with 2 books and 1 member.";
     }
@@ -173,6 +189,17 @@ public final class LibraryCatalogCliService {
      */
     private void persistState(LibraryCatalogService catalogService, CommandRequest request) throws IOException {
         persistenceService.save(catalogService.toState(), request.dataPath());
+    }
+
+    /**
+     * Adds the standard sample records to the catalog.
+     *
+     * @param catalogService target catalog
+     */
+    private void seedCatalog(LibraryCatalogService catalogService) {
+        catalogService.addBook(new Book("book-001", "The Pragmatic Programmer", "Andrew Hunt and David Thomas"));
+        catalogService.addBook(new Book("book-002", "Clean Code", "Robert C. Martin"));
+        catalogService.addMember(new Member("member-001", "Avery Stone"));
     }
 
     /**

@@ -40,6 +40,26 @@ public final class LibraryCatalogCliServiceTest {
     }
 
     /**
+     * Verifies bootstrap seeds only when the catalog file does not already exist.
+     *
+     * @throws IOException when file IO fails
+     */
+    @Test
+    void bootstrapsMissingCatalogOnlyOnce() throws IOException {
+        Path tempFile = Files.createTempFile("library-cli-bootstrap-", ".txt");
+        Files.deleteIfExists(tempFile);
+        LibraryCatalogCliService service = new LibraryCatalogCliService(new CatalogPersistenceService(), new CatalogConsoleFormatter());
+
+        String firstOutput = service.execute(new CommandRequest(CommandName.BOOTSTRAP, java.util.List.of(), tempFile));
+        String secondOutput = service.execute(new CommandRequest(CommandName.BOOTSTRAP, java.util.List.of(), tempFile));
+        String memberListing = service.execute(new CommandRequest(CommandName.LIST_MEMBERS, java.util.List.of(), tempFile));
+
+        assertEquals("Bootstrapped catalog with 2 books and 1 member.", firstOutput, "Bootstrap should seed a missing catalog.");
+        assertTrue(secondOutput.contains("Bootstrap skipped: catalog file already exists"), "Bootstrap should skip existing files.");
+        assertTrue(memberListing.contains("member-001 | Avery Stone"), "Bootstrap should persist the sample member.");
+    }
+
+    /**
      * Verifies command execution persists changes and exposes them through list commands.
      *
      * @throws IOException when file IO fails

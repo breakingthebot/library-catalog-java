@@ -30,6 +30,7 @@ public final class CatalogConsoleFormatter {
             "Data file: " + dataPath.toAbsolutePath(),
             "Commands:",
             "  help",
+            "  bootstrap",
             "  seed",
             "  add-book <book-id> <title> <author>",
             "  add-member <member-id> <name>",

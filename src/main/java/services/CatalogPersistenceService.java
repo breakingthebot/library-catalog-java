@@ -103,6 +103,17 @@ public final class CatalogPersistenceService {
     }
 
     /**
+     * Indicates whether the catalog file currently exists.
+     *
+     * @param path catalog file path
+     * @return true when the path exists
+     */
+    public boolean exists(Path path) {
+        validatePath(path);
+        return Files.exists(path);
+    }
+
+    /**
      * Parses one persisted line into a book or member record.
      *
      * @param line persisted line

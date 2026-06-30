@@ -37,6 +37,23 @@ public final class LibraryCatalogApplicationRunnerTest {
     }
 
     /**
+     * Verifies bootstrap succeeds on a missing file with a zero exit code.
+     *
+     * @throws IOException when file setup fails
+     */
+    @Test
+    void returnsSuccessForBootstrapOnMissingFile() throws IOException {
+        Path tempFile = Files.createTempFile("library-app-bootstrap-", ".txt");
+        Files.deleteIfExists(tempFile);
+        LibraryCatalogApplicationRunner runner = new LibraryCatalogApplicationRunner();
+
+        var result = runner.run(new String[] {"bootstrap", "--data", tempFile.toString()});
+
+        assertEquals(0, result.exitCode(), "Bootstrap should succeed on a missing file.");
+        assertTrue(result.output().contains("Bootstrapped catalog"), "Bootstrap should report created sample data.");
+    }
+
+    /**
      * Verifies invalid commands return a user-facing failure result.
      */
     @Test

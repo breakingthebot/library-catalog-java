@@ -11,6 +11,7 @@ package src.cli;
  */
 public enum CommandName {
     HELP,
+    BOOTSTRAP,
     SEED,
     ADD_BOOK,
     ADD_MEMBER,
