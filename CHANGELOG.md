@@ -1,0 +1,9 @@
+# Changelog
+
+## 2026-06-30
+- Scaffolded the project with `.gitignore`, MIT `LICENSE`, `.env.example`, `README.md`, and `CHANGELOG.md`.
+- Added Java domain models for books, members, and catalog state snapshots.
+- Added an in-memory catalog service with checkout and return rules.
+- Added a flat-file persistence service for saving and loading catalog state.
+- Added a CLI entry point that demonstrates registration, checkout, save, and reload.
+- Added a lightweight custom Java test runner with coverage for models, services, and utility encoding logic.
