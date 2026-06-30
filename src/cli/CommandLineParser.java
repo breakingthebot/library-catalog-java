@@ -76,6 +76,7 @@ public final class CommandLineParser {
             case "list-members" -> CommandName.LIST_MEMBERS;
             case "find-book" -> CommandName.FIND_BOOK;
             case "find-member" -> CommandName.FIND_MEMBER;
+            case "loan-report" -> CommandName.LOAN_REPORT;
             default -> throw new IllegalArgumentException("Unknown command: " + token);
         };
     }
@@ -88,7 +89,7 @@ public final class CommandLineParser {
      */
     private void validateArgumentCount(CommandName commandName, int argumentCount) {
         int expectedCount = switch (commandName) {
-            case HELP, SEED, LIST_BOOKS, LIST_MEMBERS -> 0;
+            case HELP, SEED, LIST_BOOKS, LIST_MEMBERS, LOAN_REPORT -> 0;
             case ADD_MEMBER, CHECKOUT, RETURN -> 2;
             case ADD_BOOK -> 3;
             case FIND_BOOK, FIND_MEMBER -> 1;

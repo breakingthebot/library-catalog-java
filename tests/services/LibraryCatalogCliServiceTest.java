@@ -32,6 +32,7 @@ public final class LibraryCatalogCliServiceTest {
         seedsEmptyCatalog();
         mutatesAndListsCatalog();
         searchesPersistedCatalog();
+        reportsPersistedLoans();
     }
 
     /**
@@ -91,5 +92,27 @@ public final class LibraryCatalogCliServiceTest {
         TestAssertions.assertTrue(bookResult.contains("book-710 | Clean Architecture | Robert C. Martin | available"), "Book search should return matching books.");
         TestAssertions.assertTrue(memberResult.contains("member-710 | Casey Nguyen | no borrowed books"), "Member search should return matching members.");
         TestAssertions.assertEquals("No books matched query: missing", emptyResult, "No-match search should explain the result.");
+    }
+
+    /**
+     * Verifies the loan report uses persisted checkout state.
+     *
+     * @throws IOException when file IO fails
+     */
+    private static void reportsPersistedLoans() throws IOException {
+        Path tempFile = Files.createTempFile("library-cli-loans-", ".txt");
+        Files.deleteIfExists(tempFile);
+        LibraryCatalogCliService service = new LibraryCatalogCliService(new CatalogPersistenceService(), new CatalogConsoleFormatter());
+
+        service.execute(new CommandRequest(CommandName.ADD_BOOK, java.util.List.of("book-720", "Effective Java", "Joshua Bloch"), tempFile));
+        service.execute(new CommandRequest(CommandName.ADD_MEMBER, java.util.List.of("member-720", "Taylor Stone"), tempFile));
+        service.execute(new CommandRequest(CommandName.CHECKOUT, java.util.List.of("book-720", "member-720"), tempFile));
+
+        String loanReport = service.execute(new CommandRequest(CommandName.LOAN_REPORT, java.util.List.of(), tempFile));
+
+        TestAssertions.assertTrue(
+            loanReport.contains("book-720 | Effective Java | member-720 | Taylor Stone"),
+            "Loan report should show checked-out books and the borrowing member."
+        );
     }
 }

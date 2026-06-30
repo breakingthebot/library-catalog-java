@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import src.models.Book;
 import src.models.LibraryCatalogState;
+import src.models.LoanRecord;
 import src.models.Member;
 import src.utils.TextSearchMatcher;
 
@@ -186,6 +187,25 @@ public final class LibraryCatalogService {
     }
 
     /**
+     * Returns active loans derived from the current checked-out books and members.
+     *
+     * @return active loan records in book registration order
+     */
+    public List<LoanRecord> getActiveLoans() {
+        List<LoanRecord> loans = new ArrayList<>();
+
+        for (Book book : booksById.values()) {
+            if (!book.isCheckedOut()) {
+                continue;
+            }
+
+            loans.add(buildLoanRecord(book));
+        }
+
+        return loans;
+    }
+
+    /**
      * Produces a persistence-safe snapshot of the current state.
      *
      * @return state snapshot
@@ -300,5 +320,21 @@ public final class LibraryCatalogService {
         if (query == null || query.trim().isEmpty()) {
             throw new IllegalArgumentException("Search query is required.");
         }
+    }
+
+    /**
+     * Builds a loan record for a checked-out book.
+     *
+     * @param book checked-out book
+     * @return derived loan record
+     */
+    private LoanRecord buildLoanRecord(Book book) {
+        for (Member member : membersById.values()) {
+            if (member.hasBorrowedBook(book.getId())) {
+                return new LoanRecord(book.getId(), book.getTitle(), member.getId(), member.getName());
+            }
+        }
+
+        throw new IllegalStateException("Checked out book " + book.getId() + " is not assigned to a member.");
     }
 }

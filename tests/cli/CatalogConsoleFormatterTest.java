@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import src.cli.CatalogConsoleFormatter;
 import src.models.Book;
+import src.models.LoanRecord;
 import src.models.Member;
 import tests.utils.TestAssertions;
 
@@ -29,6 +30,7 @@ public final class CatalogConsoleFormatterTest {
         rendersBookListings();
         rendersMemberListings();
         rendersEmptySearchResults();
+        rendersLoanReport();
     }
 
     /**
@@ -73,5 +75,15 @@ public final class CatalogConsoleFormatterTest {
             formatter.formatBookSearchResults(List.of(), "missing"),
             "Book searches should explain when nothing matches."
         );
+    }
+
+    /**
+     * Verifies loan report formatting.
+     */
+    private static void rendersLoanReport() {
+        CatalogConsoleFormatter formatter = new CatalogConsoleFormatter();
+        String output = formatter.formatLoanReport(List.of(new LoanRecord("book-610", "DDD", "member-610", "Jamie Cross")));
+
+        TestAssertions.assertTrue(output.contains("book-610 | DDD | member-610 | Jamie Cross"), "Loan reports should include book and member details.");
     }
 }

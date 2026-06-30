@@ -77,6 +77,7 @@ public final class LibraryCatalogCliService {
             case LIST_MEMBERS -> formatter.formatMembers(catalogService.getMembers());
             case FIND_BOOK -> executeFindBook(catalogService, request);
             case FIND_MEMBER -> executeFindMember(catalogService, request);
+            case LOAN_REPORT -> formatter.formatLoanReport(catalogService.getActiveLoans());
         };
     }
 

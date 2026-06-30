@@ -13,3 +13,5 @@
 - Added a GitHub Actions workflow that compiles the project and runs `tests.TestRunner` on pushes and pull requests.
 - Added `find-book` and `find-member` commands for case-insensitive catalog search across persisted data.
 - Added search-specific utility and tests for parser, formatter, service, and CLI search behavior.
+- Added a `loan-report` command that lists active loans as book/member pairs from persisted checkout state.
+- Added a loan read model and tests for report formatting, parser support, service derivation, and CLI output.

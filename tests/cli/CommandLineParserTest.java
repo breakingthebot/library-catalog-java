@@ -26,6 +26,7 @@ public final class CommandLineParserTest {
         defaultsToHelpWithDefaultPath();
         parsesCustomDataPath();
         parsesSearchCommand();
+        parsesLoanReportCommand();
         rejectsMissingArguments();
     }
 
@@ -61,6 +62,17 @@ public final class CommandLineParserTest {
 
         TestAssertions.assertEquals(CommandName.FIND_BOOK, request.commandName(), "Search command should parse correctly.");
         TestAssertions.assertEquals(1, request.arguments().size(), "Search command should keep a single query argument.");
+    }
+
+    /**
+     * Verifies loan report parsing.
+     */
+    private static void parsesLoanReportCommand() {
+        CommandLineParser parser = new CommandLineParser();
+        CommandRequest request = parser.parse(new String[] {"loan-report"});
+
+        TestAssertions.assertEquals(CommandName.LOAN_REPORT, request.commandName(), "Loan report command should parse correctly.");
+        TestAssertions.assertEquals(0, request.arguments().size(), "Loan report should not require arguments.");
     }
 
     /**

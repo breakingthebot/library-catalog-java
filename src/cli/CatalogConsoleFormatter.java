@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.StringJoiner;
 import src.models.Book;
+import src.models.LoanRecord;
 import src.models.Member;
 
 /**
@@ -38,6 +39,7 @@ public final class CatalogConsoleFormatter {
             "  list-members",
             "  find-book <query>",
             "  find-member <query>",
+            "  loan-report",
             "Optional flag:",
             "  --data <path>  Use a custom catalog file"
         );
@@ -115,5 +117,25 @@ public final class CatalogConsoleFormatter {
         }
 
         return formatMembers(members);
+    }
+
+    /**
+     * Formats active loan records for console output.
+     *
+     * @param loans active loans
+     * @return formatted loan report
+     */
+    public String formatLoanReport(Collection<LoanRecord> loans) {
+        if (loans.isEmpty()) {
+            return "No active loans found.";
+        }
+
+        StringJoiner joiner = new StringJoiner(System.lineSeparator());
+
+        for (LoanRecord loan : loans) {
+            joiner.add(loan.bookId() + " | " + loan.bookTitle() + " | " + loan.memberId() + " | " + loan.memberName());
+        }
+
+        return joiner.toString();
     }
 }

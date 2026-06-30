@@ -26,6 +26,7 @@ public final class LibraryCatalogServiceTest {
         rejectsDuplicateBookIds();
         rejectsCheckoutOfUnavailableBook();
         findsBooksAndMembersByPartialMatch();
+        returnsActiveLoans();
     }
 
     /**
@@ -96,5 +97,19 @@ public final class LibraryCatalogServiceTest {
         TestAssertions.assertEquals(1, service.findBooks("eric").size(), "Author search should find matching books.");
         TestAssertions.assertEquals(1, service.findBooks("domain").size(), "Title search should find matching books.");
         TestAssertions.assertEquals(1, service.findMembers("jamie").size(), "Name search should find matching members.");
+    }
+
+    /**
+     * Verifies active loan records are derived from current checkout state.
+     */
+    private static void returnsActiveLoans() {
+        LibraryCatalogService service = new LibraryCatalogService();
+        service.addBook(new Book("book-306", "Clean Architecture", "Robert C. Martin"));
+        service.addBook(new Book("book-307", "Patterns of Enterprise Application Architecture", "Martin Fowler"));
+        service.addMember(new Member("member-306", "Morgan Tate"));
+        service.checkoutBook("book-306", "member-306");
+
+        TestAssertions.assertEquals(1, service.getActiveLoans().size(), "Only checked-out books should appear in the loan report.");
+        TestAssertions.assertEquals("member-306", service.getActiveLoans().getFirst().memberId(), "Loan report should include the borrower.");
     }
 }
