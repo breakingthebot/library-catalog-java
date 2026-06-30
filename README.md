@@ -35,6 +35,8 @@ Run the CLI help:
 java -cp target/classes src.LibraryCatalogApplication help
 ```
 
+Invalid commands now return a stable non-zero exit code with a user-facing error message instead of a raw stack trace.
+
 Seed a new catalog:
 
 ```powershell
@@ -74,3 +76,4 @@ This build now uses a conventional Maven project layout instead of an ad hoc com
 - Any command can target a different file with `--data <path>`.
 - Commands currently supported: `help`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, `list-members`, `find-book`, `find-member`, and `loan-report`.
 - Continuous integration lives in `.github/workflows/java-ci.yml` and runs `./mvnw -q test` on JDK 21.
+- CLI boundary errors now return stable exit codes and clear messages with a `help` hint.

@@ -18,3 +18,5 @@
 - Migrated the project to standard Maven layout with `src/main/java` and `src/test/java`.
 - Replaced the custom test runner with JUnit 5 and added a `pom.xml` for standardized builds.
 - Updated GitHub Actions to run the Maven test suite on JDK 21.
+- Added a top-level application runner that translates parse, validation, and IO failures into stable user-facing CLI errors.
+- Added tests for successful execution, unknown commands, and business-rule failures at the application boundary.
