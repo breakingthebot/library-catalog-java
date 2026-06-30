@@ -69,6 +69,18 @@ public final class CommandLineParserTest {
     }
 
     /**
+     * Verifies overdue report parsing.
+     */
+    @Test
+    void parsesOverdueReportCommand() {
+        CommandLineParser parser = new CommandLineParser();
+        CommandRequest request = parser.parse(new String[] {"overdue-report"});
+
+        assertEquals(CommandName.OVERDUE_REPORT, request.commandName(), "Overdue report should parse correctly.");
+        assertEquals(0, request.arguments().size(), "Overdue report should not require arguments.");
+    }
+
+    /**
      * Verifies bootstrap parsing.
      */
     @Test

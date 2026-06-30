@@ -31,3 +31,6 @@
 - Added `remove-book` and `remove-member` commands for safe catalog cleanup.
 - Added guardrails that block deleting checked-out books and members who still hold borrowed books.
 - Added parser, service, and persisted CLI tests for the new removal workflows.
+- Added automatic 14-day due dates for new checkouts and persisted them with each book record.
+- Added due-date-aware loan reporting and a new `overdue-report` command.
+- Added deterministic clock-based tests for due dates, overdue filtering, formatting, and persistence round trips.

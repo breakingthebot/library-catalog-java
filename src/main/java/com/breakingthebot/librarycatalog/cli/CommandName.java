@@ -24,6 +24,7 @@ public enum CommandName {
     LIST_MEMBERS,
     FIND_BOOK,
     FIND_MEMBER,
-    LOAN_REPORT
+    LOAN_REPORT,
+    OVERDUE_REPORT
 }
 

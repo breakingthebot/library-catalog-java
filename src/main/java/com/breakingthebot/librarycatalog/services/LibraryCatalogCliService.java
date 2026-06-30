@@ -7,6 +7,7 @@
 package com.breakingthebot.librarycatalog.services;
 
 import java.io.IOException;
+import java.time.Clock;
 import java.util.List;
 import com.breakingthebot.librarycatalog.cli.CatalogConsoleFormatter;
 import com.breakingthebot.librarycatalog.cli.CommandName;
@@ -21,12 +22,13 @@ import com.breakingthebot.librarycatalog.models.Member;
 public final class LibraryCatalogCliService {
     private final CatalogPersistenceService persistenceService;
     private final CatalogConsoleFormatter formatter;
+    private final Clock clock;
 
     /**
      * Creates the CLI service with standard dependencies.
      */
     public LibraryCatalogCliService() {
-        this(new CatalogPersistenceService(), new CatalogConsoleFormatter());
+        this(new CatalogPersistenceService(), new CatalogConsoleFormatter(), Clock.systemDefaultZone());
     }
 
     /**
@@ -36,6 +38,21 @@ public final class LibraryCatalogCliService {
      * @param formatter output formatter
      */
     public LibraryCatalogCliService(CatalogPersistenceService persistenceService, CatalogConsoleFormatter formatter) {
+        this(persistenceService, formatter, Clock.systemDefaultZone());
+    }
+
+    /**
+     * Creates the CLI service with injected dependencies and clock.
+     *
+     * @param persistenceService catalog persistence implementation
+     * @param formatter output formatter
+     * @param clock time source for due-date calculations
+     */
+    public LibraryCatalogCliService(
+        CatalogPersistenceService persistenceService,
+        CatalogConsoleFormatter formatter,
+        Clock clock
+    ) {
         if (persistenceService == null) {
             throw new IllegalArgumentException("Persistence service is required.");
         }
@@ -44,8 +61,13 @@ public final class LibraryCatalogCliService {
             throw new IllegalArgumentException("Formatter is required.");
         }
 
+        if (clock == null) {
+            throw new IllegalArgumentException("Clock is required.");
+        }
+
         this.persistenceService = persistenceService;
         this.formatter = formatter;
+        this.clock = clock;
     }
 
     /**
@@ -66,7 +88,7 @@ public final class LibraryCatalogCliService {
             throw new IllegalStateException("Version commands must be handled by the application runner.");
         }
 
-        LibraryCatalogService catalogService = new LibraryCatalogService();
+        LibraryCatalogService catalogService = new LibraryCatalogService(clock);
         LibraryCatalogState loadedState = persistenceService.load(request.dataPath());
         catalogService.loadState(loadedState);
 
@@ -86,6 +108,7 @@ public final class LibraryCatalogCliService {
             case FIND_BOOK -> executeFindBook(catalogService, request);
             case FIND_MEMBER -> executeFindMember(catalogService, request);
             case LOAN_REPORT -> formatter.formatLoanReport(catalogService.getActiveLoans());
+            case OVERDUE_REPORT -> formatter.formatOverdueReport(catalogService.getOverdueLoans());
         };
     }
 

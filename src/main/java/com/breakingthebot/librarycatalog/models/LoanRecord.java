@@ -6,6 +6,8 @@
  */
 package com.breakingthebot.librarycatalog.models;
 
+import java.time.LocalDate;
+
 /**
  * Immutable read model for active catalog loans.
  *
@@ -13,8 +15,17 @@ package com.breakingthebot.librarycatalog.models;
  * @param bookTitle book title
  * @param memberId borrowing member identifier
  * @param memberName borrowing member name
+ * @param dueDate active loan due date
+ * @param overdue whether the loan is overdue
  */
-public record LoanRecord(String bookId, String bookTitle, String memberId, String memberName) {
+public record LoanRecord(
+    String bookId,
+    String bookTitle,
+    String memberId,
+    String memberName,
+    LocalDate dueDate,
+    boolean overdue
+) {
     /**
      * Validates required loan fields.
      *
@@ -22,12 +33,18 @@ public record LoanRecord(String bookId, String bookTitle, String memberId, Strin
      * @param bookTitle book title
      * @param memberId borrowing member identifier
      * @param memberName borrowing member name
+     * @param dueDate active loan due date
+     * @param overdue whether the loan is overdue
      */
     public LoanRecord {
         bookId = requireValue(bookId, "book id");
         bookTitle = requireValue(bookTitle, "book title");
         memberId = requireValue(memberId, "member id");
         memberName = requireValue(memberName, "member name");
+
+        if (dueDate == null) {
+            throw new IllegalArgumentException("Invalid due date: value is required.");
+        }
     }
 
     /**

@@ -10,6 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import org.junit.jupiter.api.Test;
 import com.breakingthebot.librarycatalog.models.Book;
 import com.breakingthebot.librarycatalog.models.Member;
@@ -24,7 +28,9 @@ public final class LibraryCatalogServiceTest {
      */
     @Test
     void checksOutAndReturnsBooks() {
-        LibraryCatalogService service = new LibraryCatalogService();
+        LibraryCatalogService service = new LibraryCatalogService(
+            Clock.fixed(Instant.parse("2026-06-30T00:00:00Z"), ZoneOffset.UTC)
+        );
         service.addBook(new Book("book-301", "Working Effectively with Legacy Code", "Michael Feathers"));
         service.addMember(new Member("member-301", "Harper Lane"));
 
@@ -37,11 +43,20 @@ public final class LibraryCatalogServiceTest {
             service.findMember("member-301").orElseThrow().hasBorrowedBook("book-301"),
             "Member loans should be tracked."
         );
+        assertEquals(
+            LocalDate.of(2026, 7, 14),
+            service.findBook("book-301").orElseThrow().getDueDate().orElseThrow(),
+            "Checkout should assign the standard due date."
+        );
 
         service.returnBook("book-301", "member-301");
         assertFalse(
             service.findBook("book-301").orElseThrow().isCheckedOut(),
             "Returned books should be available again."
+        );
+        assertTrue(
+            service.findBook("book-301").orElseThrow().getDueDate().isEmpty(),
+            "Returned books should clear their due date."
         );
     }
 
@@ -158,7 +173,9 @@ public final class LibraryCatalogServiceTest {
      */
     @Test
     void returnsActiveLoans() {
-        LibraryCatalogService service = new LibraryCatalogService();
+        LibraryCatalogService service = new LibraryCatalogService(
+            Clock.fixed(Instant.parse("2026-06-30T00:00:00Z"), ZoneOffset.UTC)
+        );
         service.addBook(new Book("book-306", "Clean Architecture", "Robert C. Martin"));
         service.addBook(new Book("book-307", "Patterns of Enterprise Application Architecture", "Martin Fowler"));
         service.addMember(new Member("member-306", "Morgan Tate"));
@@ -166,6 +183,26 @@ public final class LibraryCatalogServiceTest {
 
         assertEquals(1, service.getActiveLoans().size(), "Only checked-out books should appear in the loan report.");
         assertEquals("member-306", service.getActiveLoans().getFirst().memberId(), "Loan report should include the borrower.");
+        assertEquals(LocalDate.of(2026, 7, 14), service.getActiveLoans().getFirst().dueDate(), "Loan reports should include due dates.");
+    }
+
+    /**
+     * Verifies overdue loans are filtered from active loans.
+     */
+    @Test
+    void returnsOverdueLoans() {
+        LibraryCatalogService service = new LibraryCatalogService(
+            Clock.fixed(Instant.parse("2026-06-30T00:00:00Z"), ZoneOffset.UTC)
+        );
+        service.loadState(
+            new com.breakingthebot.librarycatalog.models.LibraryCatalogState(
+                java.util.List.of(new Book("book-308", "Pragmatic Thinking and Learning", "Andy Hunt", true, LocalDate.of(2026, 6, 1))),
+                java.util.List.of(new Member("member-308", "Dana Scott", java.util.Set.of("book-308")))
+            )
+        );
+
+        assertEquals(1, service.getOverdueLoans().size(), "Loans past their due date should appear in the overdue report.");
+        assertTrue(service.getOverdueLoans().getFirst().overdue(), "Overdue loans should be marked explicitly.");
     }
 }
 

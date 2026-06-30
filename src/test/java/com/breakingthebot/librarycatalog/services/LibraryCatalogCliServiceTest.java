@@ -9,6 +9,9 @@ package com.breakingthebot.librarycatalog.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
@@ -168,7 +171,11 @@ public final class LibraryCatalogCliServiceTest {
     void reportsPersistedLoans() throws IOException {
         Path tempFile = Files.createTempFile("library-cli-loans-", ".txt");
         Files.deleteIfExists(tempFile);
-        LibraryCatalogCliService service = new LibraryCatalogCliService(new CatalogPersistenceService(), new CatalogConsoleFormatter());
+        LibraryCatalogCliService service = new LibraryCatalogCliService(
+            new CatalogPersistenceService(),
+            new CatalogConsoleFormatter(),
+            Clock.fixed(Instant.parse("2026-06-30T00:00:00Z"), ZoneOffset.UTC)
+        );
 
         service.execute(new CommandRequest(CommandName.ADD_BOOK, java.util.List.of("book-720", "Effective Java", "Joshua Bloch"), tempFile));
         service.execute(new CommandRequest(CommandName.ADD_MEMBER, java.util.List.of("member-720", "Taylor Stone"), tempFile));
@@ -177,8 +184,40 @@ public final class LibraryCatalogCliServiceTest {
         String loanReport = service.execute(new CommandRequest(CommandName.LOAN_REPORT, java.util.List.of(), tempFile));
 
         assertTrue(
-            loanReport.contains("book-720 | Effective Java | member-720 | Taylor Stone"),
+            loanReport.contains("book-720 | Effective Java | member-720 | Taylor Stone | due 2026-07-14 | on time"),
             "Loan report should show checked-out books and the borrowing member."
+        );
+    }
+
+    /**
+     * Verifies overdue reporting uses persisted due dates and the active clock.
+     *
+     * @throws IOException when file IO fails
+     */
+    @Test
+    void reportsOverdueLoans() throws IOException {
+        Path tempFile = Files.createTempFile("library-cli-overdue-", ".txt");
+        Files.deleteIfExists(tempFile);
+        LibraryCatalogCliService checkoutService = new LibraryCatalogCliService(
+            new CatalogPersistenceService(),
+            new CatalogConsoleFormatter(),
+            Clock.fixed(Instant.parse("2026-06-30T00:00:00Z"), ZoneOffset.UTC)
+        );
+        LibraryCatalogCliService overdueService = new LibraryCatalogCliService(
+            new CatalogPersistenceService(),
+            new CatalogConsoleFormatter(),
+            Clock.fixed(Instant.parse("2026-07-20T00:00:00Z"), ZoneOffset.UTC)
+        );
+
+        checkoutService.execute(new CommandRequest(CommandName.ADD_BOOK, java.util.List.of("book-730", "Continuous Delivery", "Jez Humble"), tempFile));
+        checkoutService.execute(new CommandRequest(CommandName.ADD_MEMBER, java.util.List.of("member-730", "Ari Wells"), tempFile));
+        checkoutService.execute(new CommandRequest(CommandName.CHECKOUT, java.util.List.of("book-730", "member-730"), tempFile));
+
+        String overdueReport = overdueService.execute(new CommandRequest(CommandName.OVERDUE_REPORT, java.util.List.of(), tempFile));
+
+        assertTrue(
+            overdueReport.contains("book-730 | Continuous Delivery | member-730 | Ari Wells | due 2026-07-14 | overdue"),
+            "Overdue report should show persisted due dates and overdue status."
         );
     }
 }

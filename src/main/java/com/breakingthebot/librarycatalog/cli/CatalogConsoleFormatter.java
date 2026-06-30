@@ -44,6 +44,7 @@ public final class CatalogConsoleFormatter {
             "  find-book <query>",
             "  find-member <query>",
             "  loan-report",
+            "  overdue-report",
             "Optional flag:",
             "  --data <path>  Use a custom catalog file"
         );
@@ -137,10 +138,37 @@ public final class CatalogConsoleFormatter {
         StringJoiner joiner = new StringJoiner(System.lineSeparator());
 
         for (LoanRecord loan : loans) {
-            joiner.add(loan.bookId() + " | " + loan.bookTitle() + " | " + loan.memberId() + " | " + loan.memberName());
+            String status = loan.overdue() ? "overdue" : "on time";
+            joiner.add(
+                loan.bookId()
+                    + " | "
+                    + loan.bookTitle()
+                    + " | "
+                    + loan.memberId()
+                    + " | "
+                    + loan.memberName()
+                    + " | due "
+                    + loan.dueDate()
+                    + " | "
+                    + status
+            );
         }
 
         return joiner.toString();
+    }
+
+    /**
+     * Formats overdue loan records for console output.
+     *
+     * @param loans overdue loans
+     * @return formatted overdue report
+     */
+    public String formatOverdueReport(Collection<LoanRecord> loans) {
+        if (loans.isEmpty()) {
+            return "No overdue loans found.";
+        }
+
+        return formatLoanReport(loans);
     }
 }
 

@@ -6,6 +6,8 @@
  */
 package com.breakingthebot.librarycatalog.services;
 
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -25,9 +27,31 @@ import com.breakingthebot.librarycatalog.utils.TextSearchMatcher;
  */
 public final class LibraryCatalogService {
     private static final Logger LOGGER = Logger.getLogger(LibraryCatalogService.class.getName());
+    private static final long LOAN_PERIOD_DAYS = 14;
 
     private final Map<String, Book> booksById = new LinkedHashMap<>();
     private final Map<String, Member> membersById = new LinkedHashMap<>();
+    private final Clock clock;
+
+    /**
+     * Creates the service with the system clock.
+     */
+    public LibraryCatalogService() {
+        this(Clock.systemDefaultZone());
+    }
+
+    /**
+     * Creates the service with an injected clock.
+     *
+     * @param clock time source for due-date calculations
+     */
+    public LibraryCatalogService(Clock clock) {
+        if (clock == null) {
+            throw new IllegalArgumentException("Clock is required.");
+        }
+
+        this.clock = clock;
+    }
 
     /**
      * Registers a new book in the catalog.
@@ -107,7 +131,7 @@ public final class LibraryCatalogService {
             throw new IllegalStateException("Cannot checkout book " + bookId + ": book is already checked out.");
         }
 
-        book.checkout();
+        book.checkout(LocalDate.now(clock).plusDays(LOAN_PERIOD_DAYS));
         member.borrowBook(bookId);
         LOGGER.log(Level.INFO, "Checked out book {0} to member {1}", new Object[] {bookId, memberId});
     }
@@ -225,16 +249,34 @@ public final class LibraryCatalogService {
      */
     public List<LoanRecord> getActiveLoans() {
         List<LoanRecord> loans = new ArrayList<>();
+        LocalDate today = LocalDate.now(clock);
 
         for (Book book : booksById.values()) {
             if (!book.isCheckedOut()) {
                 continue;
             }
 
-            loans.add(buildLoanRecord(book));
+            loans.add(buildLoanRecord(book, today));
         }
 
         return loans;
+    }
+
+    /**
+     * Returns only overdue loans derived from the current checkout state.
+     *
+     * @return overdue loan records in book registration order
+     */
+    public List<LoanRecord> getOverdueLoans() {
+        List<LoanRecord> overdueLoans = new ArrayList<>();
+
+        for (LoanRecord loan : getActiveLoans()) {
+            if (loan.overdue()) {
+                overdueLoans.add(loan);
+            }
+        }
+
+        return overdueLoans;
     }
 
     /**
@@ -360,10 +402,20 @@ public final class LibraryCatalogService {
      * @param book checked-out book
      * @return derived loan record
      */
-    private LoanRecord buildLoanRecord(Book book) {
+    private LoanRecord buildLoanRecord(Book book, LocalDate today) {
+        LocalDate dueDate = book.getDueDate()
+            .orElseThrow(() -> new IllegalStateException("Checked out book " + book.getId() + " is missing a due date."));
+
         for (Member member : membersById.values()) {
             if (member.hasBorrowedBook(book.getId())) {
-                return new LoanRecord(book.getId(), book.getTitle(), member.getId(), member.getName());
+                return new LoanRecord(
+                    book.getId(),
+                    book.getTitle(),
+                    member.getId(),
+                    member.getName(),
+                    dueDate,
+                    dueDate.isBefore(today)
+                );
             }
         }
 

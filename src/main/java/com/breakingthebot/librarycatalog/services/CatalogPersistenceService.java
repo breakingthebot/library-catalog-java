@@ -7,6 +7,7 @@
 package com.breakingthebot.librarycatalog.services;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,7 +50,8 @@ public final class CatalogPersistenceService {
                 FieldCodec.encode(book.getId()),
                 FieldCodec.encode(book.getTitle()),
                 FieldCodec.encode(book.getAuthor()),
-                Boolean.toString(book.isCheckedOut())
+                Boolean.toString(book.isCheckedOut()),
+                book.getDueDate().map(LocalDate::toString).orElse("")
             ));
         }
 
@@ -149,15 +151,21 @@ public final class CatalogPersistenceService {
      * @return parsed book
      */
     private Book parseBook(String[] fields) {
-        if (fields.length != 5) {
-            throw new IllegalArgumentException("Invalid book record: expected 5 fields.");
+        if (fields.length != 5 && fields.length != 6) {
+            throw new IllegalArgumentException("Invalid book record: expected 5 or 6 fields.");
+        }
+
+        LocalDate dueDate = null;
+        if (fields.length == 6 && !fields[5].isBlank()) {
+            dueDate = LocalDate.parse(fields[5]);
         }
 
         return new Book(
             FieldCodec.decode(fields[1]),
             FieldCodec.decode(fields[2]),
             FieldCodec.decode(fields[3]),
-            Boolean.parseBoolean(fields[4])
+            Boolean.parseBoolean(fields[4]),
+            dueDate
         );
     }
 

@@ -6,6 +6,9 @@
  */
 package com.breakingthebot.librarycatalog.models;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
 /**
  * Represents a single book in the library catalog.
  */
@@ -14,6 +17,7 @@ public final class Book {
     private final String title;
     private final String author;
     private boolean checkedOut;
+    private LocalDate dueDate;
 
     /**
      * Creates a book with an available checkout state.
@@ -23,7 +27,7 @@ public final class Book {
      * @param author book author
      */
     public Book(String id, String title, String author) {
-        this(id, title, author, false);
+        this(id, title, author, false, null);
     }
 
     /**
@@ -35,10 +39,24 @@ public final class Book {
      * @param checkedOut whether the book is already checked out
      */
     public Book(String id, String title, String author, boolean checkedOut) {
+        this(id, title, author, checkedOut, null);
+    }
+
+    /**
+     * Creates a book with an explicit checkout state and optional due date.
+     *
+     * @param id unique book identifier
+     * @param title book title
+     * @param author book author
+     * @param checkedOut whether the book is already checked out
+     * @param dueDate due date for the active loan when present
+     */
+    public Book(String id, String title, String author, boolean checkedOut, LocalDate dueDate) {
         this.id = validateText(id, "book id");
         this.title = validateText(title, "book title");
         this.author = validateText(author, "book author");
         this.checkedOut = checkedOut;
+        this.dueDate = dueDate;
     }
 
     /**
@@ -78,10 +96,26 @@ public final class Book {
     }
 
     /**
-     * Marks the book as checked out.
+     * Returns the due date for an active loan when present.
+     *
+     * @return due date for the active loan
      */
-    public void checkout() {
+    public Optional<LocalDate> getDueDate() {
+        return Optional.ofNullable(dueDate);
+    }
+
+    /**
+     * Marks the book as checked out with a due date.
+     *
+     * @param dueDate due date for the new loan
+     */
+    public void checkout(LocalDate dueDate) {
+        if (dueDate == null) {
+            throw new IllegalArgumentException("Loan due date is required.");
+        }
+
         checkedOut = true;
+        this.dueDate = dueDate;
     }
 
     /**
@@ -89,6 +123,7 @@ public final class Book {
      */
     public void checkin() {
         checkedOut = false;
+        dueDate = null;
     }
 
     /**

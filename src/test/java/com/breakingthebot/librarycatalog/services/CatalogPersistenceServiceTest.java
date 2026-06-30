@@ -9,6 +9,7 @@ package com.breakingthebot.librarycatalog.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,9 @@ public final class CatalogPersistenceServiceTest {
         Path tempFile = Files.createTempFile("library-catalog-", ".txt");
 
         LibraryCatalogState state = new LibraryCatalogState(
-            java.util.List.of(new Book("book-401", "Patterns of Enterprise Application Architecture", "Martin Fowler", true)),
+            java.util.List.of(
+                new Book("book-401", "Patterns of Enterprise Application Architecture", "Martin Fowler", true, LocalDate.of(2026, 7, 14))
+            ),
             java.util.List.of(new Member("member-401", "Taylor North", java.util.Set.of("book-401")))
         );
 
@@ -42,6 +45,7 @@ public final class CatalogPersistenceServiceTest {
         assertEquals(1, loadedState.books().size(), "Saved state should reload the book list.");
         assertEquals(1, loadedState.members().size(), "Saved state should reload the member list.");
         assertTrue(loadedState.books().getFirst().isCheckedOut(), "Book checkout state should persist.");
+        assertEquals(LocalDate.of(2026, 7, 14), loadedState.books().getFirst().getDueDate().orElseThrow(), "Book due dates should persist.");
         assertTrue(
             loadedState.members().getFirst().hasBorrowedBook("book-401"),
             "Member loans should persist."

@@ -8,6 +8,7 @@ package com.breakingthebot.librarycatalog.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.time.LocalDate;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ public final class CatalogConsoleFormatterTest {
         String output = formatter.formatHelp(Path.of("data/catalog.txt"));
 
         assertTrue(output.contains("add-book <book-id> <title> <author>"), "Help should list book creation.");
+        assertTrue(output.contains("overdue-report"), "Help should list the overdue report command.");
         assertTrue(output.contains("--data <path>"), "Help should describe the data flag.");
     }
 
@@ -75,9 +77,11 @@ public final class CatalogConsoleFormatterTest {
     @Test
     void rendersLoanReport() {
         CatalogConsoleFormatter formatter = new CatalogConsoleFormatter();
-        String output = formatter.formatLoanReport(List.of(new LoanRecord("book-610", "DDD", "member-610", "Jamie Cross")));
+        String output = formatter.formatLoanReport(
+            List.of(new LoanRecord("book-610", "DDD", "member-610", "Jamie Cross", LocalDate.of(2026, 7, 14), true))
+        );
 
-        assertTrue(output.contains("book-610 | DDD | member-610 | Jamie Cross"), "Loan reports should include book and member details.");
+        assertTrue(output.contains("book-610 | DDD | member-610 | Jamie Cross | due 2026-07-14 | overdue"), "Loan reports should include due dates and status.");
     }
 }
 

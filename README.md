@@ -79,6 +79,7 @@ java -jar target/library-catalog.jar list-members
 java -jar target/library-catalog.jar find-book "domain"
 java -jar target/library-catalog.jar find-member "jamie"
 java -jar target/library-catalog.jar loan-report
+java -jar target/library-catalog.jar overdue-report
 ```
 
 ## CI
@@ -88,16 +89,19 @@ GitHub Actions runs `./mvnw -q package` on every push to `main` and every pull r
 Not deployed. This is a local Java command-line project.
 
 ## Architecture Notes
-This build now uses a conventional Maven project layout instead of an ad hoc compile script and custom test runner. The application code lives under `src/main/java`, the tests live under `src/test/java`, and JUnit 5 now drives the test suite. On top of that, the Maven build now produces a runnable jar, so the project is no longer just source you can build; it is a CLI artifact you can package and launch directly with `java -jar`. The internal Java packages now use a real namespace, `com.breakingthebot.librarycatalog`, which makes the codebase look and behave like a conventional Java project instead of a temporary scaffold. This iteration also rounds out the catalog lifecycle by letting you remove books and members safely, with explicit guards that block deleting checked-out books or members who still hold loans.
+This build now uses a conventional Maven project layout instead of an ad hoc compile script and custom test runner. The application code lives under `src/main/java`, the tests live under `src/test/java`, and JUnit 5 now drives the test suite. On top of that, the Maven build now produces a runnable jar, so the project is no longer just source you can build; it is a CLI artifact you can package and launch directly with `java -jar`. The internal Java packages now use a real namespace, `com.breakingthebot.librarycatalog`, which makes the codebase look and behave like a conventional Java project instead of a temporary scaffold. This iteration also moves the checkout flow closer to a real lending system by assigning a default 14-day due date on checkout, persisting that date with the catalog, and exposing a dedicated overdue report so the CLI can separate active loans from late ones.
 
 ## Notes
 - The project now uses Maven with JUnit 5 instead of the earlier custom test harness.
 - The default catalog file is `data/library-catalog.txt`.
 - Any command can target a different file with `--data <path>`.
-- Commands currently supported: `help`, `version`, `--version`, `bootstrap`, `seed`, `add-book`, `add-member`, `remove-book`, `remove-member`, `checkout`, `return`, `list-books`, `list-members`, `find-book`, `find-member`, and `loan-report`.
+- Commands currently supported: `help`, `version`, `--version`, `bootstrap`, `seed`, `add-book`, `add-member`, `remove-book`, `remove-member`, `checkout`, `return`, `list-books`, `list-members`, `find-book`, `find-member`, `loan-report`, and `overdue-report`.
 - Continuous integration lives in `.github/workflows/java-ci.yml` and runs `./mvnw -q package` on JDK 21.
 - CLI boundary errors now return stable exit codes and clear messages with a `help` hint.
 - `bootstrap` seeds sample data only when the target catalog file does not already exist; it never overwrites an existing file.
+- `checkout` assigns a default due date 14 days from the checkout date.
+- `loan-report` now shows due dates and whether each active loan is overdue.
+- `overdue-report` only lists loans whose due dates are already in the past.
 - `remove-book` only works for available books, and `remove-member` only works for members with no active loans.
 - The primary distributable artifact is `target/library-catalog.jar`.
 - The code now uses the `com.breakingthebot.librarycatalog` package namespace across production and test code.
