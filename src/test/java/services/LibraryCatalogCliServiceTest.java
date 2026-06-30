@@ -1,54 +1,42 @@
 /*
- * tests/services/LibraryCatalogCliServiceTest.java
- * Verifies the interactive CLI service executes commands against persisted catalog data.
- * Connects to: src/services/LibraryCatalogCliService.java, src/cli/*.java, src/models/*.java, tests/utils/TestAssertions.java
+ * src/test/java/services/LibraryCatalogCliServiceTest.java
+ * Verifies the interactive CLI service executes commands against persisted catalog data with JUnit 5.
+ * Connects to: src/main/java/services/LibraryCatalogCliService.java, src/main/java/cli/*.java, src/main/java/models/*.java
  * Created: 2026-06-30
  */
 package tests.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.junit.jupiter.api.Test;
 import src.cli.CatalogConsoleFormatter;
 import src.cli.CommandName;
 import src.models.CommandRequest;
 import src.services.CatalogPersistenceService;
 import src.services.LibraryCatalogCliService;
-import tests.utils.TestAssertions;
 
 /**
  * Tests the application-level CLI workflow.
  */
 public final class LibraryCatalogCliServiceTest {
-    private LibraryCatalogCliServiceTest() {
-    }
-
-    /**
-     * Runs all CLI service tests.
-     *
-     * @throws IOException when file IO fails
-     */
-    public static void runAll() throws IOException {
-        seedsEmptyCatalog();
-        mutatesAndListsCatalog();
-        searchesPersistedCatalog();
-        reportsPersistedLoans();
-    }
-
     /**
      * Verifies the seed command initializes a new catalog file.
      *
      * @throws IOException when file IO fails
      */
-    private static void seedsEmptyCatalog() throws IOException {
+    @Test
+    void seedsEmptyCatalog() throws IOException {
         Path tempFile = Files.createTempFile("library-cli-seed-", ".txt");
         Files.deleteIfExists(tempFile);
         LibraryCatalogCliService service = new LibraryCatalogCliService(new CatalogPersistenceService(), new CatalogConsoleFormatter());
 
         String output = service.execute(new CommandRequest(CommandName.SEED, java.util.List.of(), tempFile));
 
-        TestAssertions.assertEquals("Seeded catalog with 2 books and 1 member.", output, "Seed should report created sample data.");
-        TestAssertions.assertTrue(Files.exists(tempFile), "Seed should create the catalog file.");
+        assertEquals("Seeded catalog with 2 books and 1 member.", output, "Seed should report created sample data.");
+        assertTrue(Files.exists(tempFile), "Seed should create the catalog file.");
     }
 
     /**
@@ -56,7 +44,8 @@ public final class LibraryCatalogCliServiceTest {
      *
      * @throws IOException when file IO fails
      */
-    private static void mutatesAndListsCatalog() throws IOException {
+    @Test
+    void mutatesAndListsCatalog() throws IOException {
         Path tempFile = Files.createTempFile("library-cli-state-", ".txt");
         Files.deleteIfExists(tempFile);
         LibraryCatalogCliService service = new LibraryCatalogCliService(new CatalogPersistenceService(), new CatalogConsoleFormatter());
@@ -68,8 +57,8 @@ public final class LibraryCatalogCliServiceTest {
         String bookListing = service.execute(new CommandRequest(CommandName.LIST_BOOKS, java.util.List.of(), tempFile));
         String memberListing = service.execute(new CommandRequest(CommandName.LIST_MEMBERS, java.util.List.of(), tempFile));
 
-        TestAssertions.assertTrue(bookListing.contains("book-700 | Release It! | Michael Nygard | checked out"), "Book listing should reflect checkout state.");
-        TestAssertions.assertTrue(memberListing.contains("member-700 | Drew Cole | book-700"), "Member listing should reflect borrowed books.");
+        assertTrue(bookListing.contains("book-700 | Release It! | Michael Nygard | checked out"), "Book listing should reflect checkout state.");
+        assertTrue(memberListing.contains("member-700 | Drew Cole | book-700"), "Member listing should reflect borrowed books.");
     }
 
     /**
@@ -77,7 +66,8 @@ public final class LibraryCatalogCliServiceTest {
      *
      * @throws IOException when file IO fails
      */
-    private static void searchesPersistedCatalog() throws IOException {
+    @Test
+    void searchesPersistedCatalog() throws IOException {
         Path tempFile = Files.createTempFile("library-cli-search-", ".txt");
         Files.deleteIfExists(tempFile);
         LibraryCatalogCliService service = new LibraryCatalogCliService(new CatalogPersistenceService(), new CatalogConsoleFormatter());
@@ -89,9 +79,9 @@ public final class LibraryCatalogCliServiceTest {
         String memberResult = service.execute(new CommandRequest(CommandName.FIND_MEMBER, java.util.List.of("casey"), tempFile));
         String emptyResult = service.execute(new CommandRequest(CommandName.FIND_BOOK, java.util.List.of("missing"), tempFile));
 
-        TestAssertions.assertTrue(bookResult.contains("book-710 | Clean Architecture | Robert C. Martin | available"), "Book search should return matching books.");
-        TestAssertions.assertTrue(memberResult.contains("member-710 | Casey Nguyen | no borrowed books"), "Member search should return matching members.");
-        TestAssertions.assertEquals("No books matched query: missing", emptyResult, "No-match search should explain the result.");
+        assertTrue(bookResult.contains("book-710 | Clean Architecture | Robert C. Martin | available"), "Book search should return matching books.");
+        assertTrue(memberResult.contains("member-710 | Casey Nguyen | no borrowed books"), "Member search should return matching members.");
+        assertEquals("No books matched query: missing", emptyResult, "No-match search should explain the result.");
     }
 
     /**
@@ -99,7 +89,8 @@ public final class LibraryCatalogCliServiceTest {
      *
      * @throws IOException when file IO fails
      */
-    private static void reportsPersistedLoans() throws IOException {
+    @Test
+    void reportsPersistedLoans() throws IOException {
         Path tempFile = Files.createTempFile("library-cli-loans-", ".txt");
         Files.deleteIfExists(tempFile);
         LibraryCatalogCliService service = new LibraryCatalogCliService(new CatalogPersistenceService(), new CatalogConsoleFormatter());
@@ -110,7 +101,7 @@ public final class LibraryCatalogCliServiceTest {
 
         String loanReport = service.execute(new CommandRequest(CommandName.LOAN_REPORT, java.util.List.of(), tempFile));
 
-        TestAssertions.assertTrue(
+        assertTrue(
             loanReport.contains("book-720 | Effective Java | member-720 | Taylor Stone"),
             "Loan report should show checked-out books and the borrowing member."
         );

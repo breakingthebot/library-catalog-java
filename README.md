@@ -3,74 +3,74 @@
 Java command-line library catalog that models books and members, supports interactive checkout commands, and persists catalog state to a flat file.
 
 ## Stack
-- Java 24
-- Standard library only
-- Plain `javac` / `java` workflow for iterations 1-2
+- Java 21+ compatible source level
+- Maven
+- JUnit 5
 
 ## Setup
-1. Install JDK 24 or a compatible recent JDK.
+1. Install JDK 21 or a compatible newer JDK.
 2. Clone the repository.
 3. Open a terminal in the project root.
+4. Use the committed Maven wrapper scripts instead of requiring a separate Maven install.
 
 ## Environment Variables
 This project currently requires no environment variables. See `.env.example`.
 
 ## Running Locally
-Compile the app and tests:
+Run the Maven test suite:
 
 ```powershell
-New-Item -ItemType Directory -Force out | Out-Null
-javac -d out (Get-ChildItem -Recurse -Filter *.java | ForEach-Object { $_.FullName })
+.\mvnw.cmd test
+```
+
+Package the application classes:
+
+```powershell
+.\mvnw.cmd -q -DskipTests package
 ```
 
 Run the CLI help:
 
 ```powershell
-java -cp out src.LibraryCatalogApplication help
+java -cp target/classes src.LibraryCatalogApplication help
 ```
 
 Seed a new catalog:
 
 ```powershell
-java -cp out src.LibraryCatalogApplication seed
+java -cp target/classes src.LibraryCatalogApplication seed
 ```
 
 Add a book and member:
 
 ```powershell
-java -cp out src.LibraryCatalogApplication add-book book-010 "Domain-Driven Design" "Eric Evans"
-java -cp out src.LibraryCatalogApplication add-member member-010 "Jamie Cross"
+java -cp target/classes src.LibraryCatalogApplication add-book book-010 "Domain-Driven Design" "Eric Evans"
+java -cp target/classes src.LibraryCatalogApplication add-member member-010 "Jamie Cross"
 ```
 
 Checkout and inspect the catalog:
 
 ```powershell
-java -cp out src.LibraryCatalogApplication checkout book-010 member-010
-java -cp out src.LibraryCatalogApplication list-books
-java -cp out src.LibraryCatalogApplication list-members
-java -cp out src.LibraryCatalogApplication find-book "domain"
-java -cp out src.LibraryCatalogApplication find-member "jamie"
-java -cp out src.LibraryCatalogApplication loan-report
-```
-
-Run the tests:
-
-```powershell
-java -cp out tests.TestRunner
+java -cp target/classes src.LibraryCatalogApplication checkout book-010 member-010
+java -cp target/classes src.LibraryCatalogApplication list-books
+java -cp target/classes src.LibraryCatalogApplication list-members
+java -cp target/classes src.LibraryCatalogApplication find-book "domain"
+java -cp target/classes src.LibraryCatalogApplication find-member "jamie"
+java -cp target/classes src.LibraryCatalogApplication loan-report
 ```
 
 ## CI
-GitHub Actions runs the same compile and test commands on every push to `main` and every pull request targeting `main`.
+GitHub Actions runs `./mvnw -q test` on every push to `main` and every pull request targeting `main`.
 
 ## Deployed
 Not deployed. This is a local Java command-line project.
 
 ## Architecture Notes
-This build turns the library system into an actual command-line tool instead of a fixed demo. The domain and persistence layers from the first iteration stay intact, and a dedicated CLI parser plus an application service now load the saved catalog, run one command, and persist changes back to disk. Search commands and the loan report now sit on top of the same core service, which means lookup and reporting features reuse the same in-memory model instead of creating separate data paths.
+This build now uses a conventional Maven project layout instead of an ad hoc compile script and custom test runner. The application code lives under `src/main/java`, the tests live under `src/test/java`, and JUnit 5 now drives the test suite. That makes the project easier for a Java team to open, understand, and run in a standard way while keeping the existing domain, CLI, search, and reporting logic intact.
 
 ## Notes
-- Iteration 1 uses a custom lightweight test runner because Maven is not installed locally.
+- The project now uses Maven with JUnit 5 instead of the earlier custom test harness.
 - The default catalog file is `data/library-catalog.txt`.
 - Any command can target a different file with `--data <path>`.
 - Commands currently supported: `help`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, `list-members`, `find-book`, `find-member`, and `loan-report`.
-- Continuous integration lives in `.github/workflows/java-ci.yml` and uses JDK 24.
+- Continuous integration lives in `.github/workflows/java-ci.yml` and runs `./mvnw -q test` on JDK 21.

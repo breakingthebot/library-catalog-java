@@ -15,3 +15,6 @@
 - Added search-specific utility and tests for parser, formatter, service, and CLI search behavior.
 - Added a `loan-report` command that lists active loans as book/member pairs from persisted checkout state.
 - Added a loan read model and tests for report formatting, parser support, service derivation, and CLI output.
+- Migrated the project to standard Maven layout with `src/main/java` and `src/test/java`.
+- Replaced the custom test runner with JUnit 5 and added a `pom.xml` for standardized builds.
+- Updated GitHub Actions to run the Maven test suite on JDK 21.

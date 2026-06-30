@@ -1,6 +1,6 @@
 # .github/workflows/java-ci.yml
-# Runs compile and test checks for the Java library catalog on GitHub Actions.
-# Connects to: src/**/*.java, tests/**/*.java
+# Runs Maven-based compile and test checks for the Java library catalog on GitHub Actions.
+# Connects to: pom.xml, src/main/java/**, src/test/java/**
 # Created: 2026-06-30
 name: Java CI
 
@@ -24,12 +24,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "24"
+          java-version: "21"
+          cache: maven
 
-      - name: Compile project
-        run: |
-          mkdir -p out
-          javac -d out $(find src tests -name "*.java")
-
-      - name: Run test suite
-        run: java -cp out tests.TestRunner
+      - name: Run Maven test suite
+        run: ./mvnw -q test

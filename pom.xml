@@ -1,0 +1,32 @@
+<!--
+  pom.xml
+  Standard Maven build configuration for the library catalog CLI.
+  Connects to: src/main/java/**, src/test/java/**, .github/workflows/java-ci.yml
+  Created: 2026-06-30
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.breakingthebot</groupId>
+  <artifactId>library-catalog-java</artifactId>
+  <version>0.6.0-SNAPSHOT</version>
+  <name>Library Catalog Java</name>
+  <description>Command-line library catalog with persistence, search, and reporting.</description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>21</maven.compiler.release>
+    <junit.jupiter.version>5.12.2</junit.jupiter.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${junit.jupiter.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
