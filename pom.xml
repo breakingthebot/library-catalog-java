@@ -40,7 +40,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>src.LibraryCatalogApplication</mainClass>
+              <mainClass>com.breakingthebot.librarycatalog.LibraryCatalogApplication</mainClass>
             </manifest>
           </archive>
         </configuration>

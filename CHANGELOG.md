@@ -24,3 +24,5 @@
 - Added tests for bootstrap parsing, first-run initialization, and idempotent skip behavior for existing files.
 - Added Maven JAR plugin configuration so packaging produces a runnable `target/library-catalog.jar`.
 - Updated CI and local docs to validate and launch the executable jar with `java -jar`.
+- Renamed Java packages from `src.*` and `tests.*` to the real application namespace `com.breakingthebot.librarycatalog.*`.
+- Updated the runnable jar manifest to use the renamed main application class.
