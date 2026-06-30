@@ -11,6 +11,7 @@ package com.breakingthebot.librarycatalog.cli;
  */
 public enum CommandName {
     HELP,
+    VERSION,
     BOOTSTRAP,
     SEED,
     ADD_BOOK,

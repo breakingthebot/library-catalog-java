@@ -62,12 +62,17 @@ public final class LibraryCatalogCliService {
             return formatter.formatHelp(request.dataPath());
         }
 
+        if (request.commandName() == CommandName.VERSION) {
+            throw new IllegalStateException("Version commands must be handled by the application runner.");
+        }
+
         LibraryCatalogService catalogService = new LibraryCatalogService();
         LibraryCatalogState loadedState = persistenceService.load(request.dataPath());
         catalogService.loadState(loadedState);
 
         return switch (request.commandName()) {
             case HELP -> formatter.formatHelp(request.dataPath());
+            case VERSION -> throw new IllegalStateException("Version commands must be handled by the application runner.");
             case BOOTSTRAP -> executeBootstrap(request);
             case SEED -> executeSeed(catalogService, request);
             case ADD_BOOK -> executeAddBook(catalogService, request);

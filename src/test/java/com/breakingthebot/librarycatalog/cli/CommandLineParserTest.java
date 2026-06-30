@@ -81,6 +81,18 @@ public final class CommandLineParserTest {
     }
 
     /**
+     * Verifies version parsing.
+     */
+    @Test
+    void parsesVersionCommand() {
+        CommandLineParser parser = new CommandLineParser();
+        CommandRequest request = parser.parse(new String[] {"--version"});
+
+        assertEquals(CommandName.VERSION, request.commandName(), "Version flag should parse correctly.");
+        assertEquals(0, request.arguments().size(), "Version should not require arguments.");
+    }
+
+    /**
      * Verifies incorrect argument counts are rejected.
      */
     @Test

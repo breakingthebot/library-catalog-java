@@ -54,6 +54,19 @@ public final class LibraryCatalogApplicationRunnerTest {
     }
 
     /**
+     * Verifies the version command returns a stable success result.
+     */
+    @Test
+    void returnsSuccessForVersionCommand() {
+        LibraryCatalogApplicationRunner runner = new LibraryCatalogApplicationRunner();
+
+        var result = runner.run(new String[] {"--version"});
+
+        assertEquals(0, result.exitCode(), "Version should succeed.");
+        assertTrue(result.output().contains("library-catalog-java"), "Version output should include the artifact name.");
+    }
+
+    /**
      * Verifies invalid commands return a user-facing failure result.
      */
     @Test

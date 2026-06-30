@@ -67,6 +67,7 @@ public final class CommandLineParser {
     private CommandName parseCommandName(String token) {
         return switch (token.toLowerCase()) {
             case "help" -> CommandName.HELP;
+            case "version", "--version" -> CommandName.VERSION;
             case "bootstrap" -> CommandName.BOOTSTRAP;
             case "seed" -> CommandName.SEED;
             case "add-book" -> CommandName.ADD_BOOK;
@@ -90,7 +91,7 @@ public final class CommandLineParser {
      */
     private void validateArgumentCount(CommandName commandName, int argumentCount) {
         int expectedCount = switch (commandName) {
-            case HELP, BOOTSTRAP, SEED, LIST_BOOKS, LIST_MEMBERS, LOAN_REPORT -> 0;
+            case HELP, VERSION, BOOTSTRAP, SEED, LIST_BOOKS, LIST_MEMBERS, LOAN_REPORT -> 0;
             case ADD_MEMBER, CHECKOUT, RETURN -> 2;
             case ADD_BOOK -> 3;
             case FIND_BOOK, FIND_MEMBER -> 1;

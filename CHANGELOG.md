@@ -26,3 +26,5 @@
 - Updated CI and local docs to validate and launch the executable jar with `java -jar`.
 - Renamed Java packages from `src.*` and `tests.*` to the real application namespace `com.breakingthebot.librarycatalog.*`.
 - Updated the runnable jar manifest to use the renamed main application class.
+- Added `version` / `--version` support backed by Maven-generated package metadata.
+- Added tests for version parsing, application-level version output, and metadata fallback behavior during test runs.

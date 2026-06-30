@@ -8,6 +8,7 @@ package com.breakingthebot.librarycatalog.services;
 
 import java.io.IOException;
 import com.breakingthebot.librarycatalog.cli.CommandLineParser;
+import com.breakingthebot.librarycatalog.cli.CommandName;
 import com.breakingthebot.librarycatalog.models.ApplicationExecutionResult;
 import com.breakingthebot.librarycatalog.models.CommandRequest;
 
@@ -20,12 +21,13 @@ public final class LibraryCatalogApplicationRunner {
 
     private final CommandLineParser parser;
     private final LibraryCatalogCliService cliService;
+    private final ApplicationVersionProvider versionProvider;
 
     /**
      * Creates the runner with standard dependencies.
      */
     public LibraryCatalogApplicationRunner() {
-        this(new CommandLineParser(), new LibraryCatalogCliService());
+        this(new CommandLineParser(), new LibraryCatalogCliService(), new ApplicationVersionProvider());
     }
 
     /**
@@ -33,8 +35,13 @@ public final class LibraryCatalogApplicationRunner {
      *
      * @param parser CLI parser
      * @param cliService CLI application service
+     * @param versionProvider application version provider
      */
-    public LibraryCatalogApplicationRunner(CommandLineParser parser, LibraryCatalogCliService cliService) {
+    public LibraryCatalogApplicationRunner(
+        CommandLineParser parser,
+        LibraryCatalogCliService cliService,
+        ApplicationVersionProvider versionProvider
+    ) {
         if (parser == null) {
             throw new IllegalArgumentException("Parser is required.");
         }
@@ -43,8 +50,13 @@ public final class LibraryCatalogApplicationRunner {
             throw new IllegalArgumentException("CLI service is required.");
         }
 
+        if (versionProvider == null) {
+            throw new IllegalArgumentException("Version provider is required.");
+        }
+
         this.parser = parser;
         this.cliService = cliService;
+        this.versionProvider = versionProvider;
     }
 
     /**
@@ -56,6 +68,9 @@ public final class LibraryCatalogApplicationRunner {
     public ApplicationExecutionResult run(String[] args) {
         try {
             CommandRequest request = parser.parse(args);
+            if (request.commandName() == CommandName.VERSION) {
+                return ApplicationExecutionResult.success("library-catalog-java " + versionProvider.getVersion());
+            }
             String output = cliService.execute(request);
             return ApplicationExecutionResult.success(output);
         } catch (IllegalArgumentException | IllegalStateException exception) {

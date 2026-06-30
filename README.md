@@ -36,6 +36,12 @@ Run the CLI help:
 java -jar target/library-catalog.jar help
 ```
 
+Print the packaged application version:
+
+```powershell
+java -jar target/library-catalog.jar --version
+```
+
 Invalid commands now return a stable non-zero exit code with a user-facing error message instead of a raw stack trace.
 
 Bootstrap a missing catalog with sample data only on first run:
@@ -81,9 +87,10 @@ This build now uses a conventional Maven project layout instead of an ad hoc com
 - The project now uses Maven with JUnit 5 instead of the earlier custom test harness.
 - The default catalog file is `data/library-catalog.txt`.
 - Any command can target a different file with `--data <path>`.
-- Commands currently supported: `help`, `bootstrap`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, `list-members`, `find-book`, `find-member`, and `loan-report`.
+- Commands currently supported: `help`, `version`, `--version`, `bootstrap`, `seed`, `add-book`, `add-member`, `checkout`, `return`, `list-books`, `list-members`, `find-book`, `find-member`, and `loan-report`.
 - Continuous integration lives in `.github/workflows/java-ci.yml` and runs `./mvnw -q package` on JDK 21.
 - CLI boundary errors now return stable exit codes and clear messages with a `help` hint.
 - `bootstrap` seeds sample data only when the target catalog file does not already exist; it never overwrites an existing file.
 - The primary distributable artifact is `target/library-catalog.jar`.
 - The code now uses the `com.breakingthebot.librarycatalog` package namespace across production and test code.
+- `--version` reads Maven metadata from the packaged artifact and prints the current application version.
